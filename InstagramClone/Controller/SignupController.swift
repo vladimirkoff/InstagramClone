@@ -79,15 +79,17 @@ class SignupController: UIViewController, FormViewModel {
     func configureUI() {
         configureGradient()
         
+        view.addSubview(plusButton)
+        plusButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4).isActive = true
+        plusButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-        
-        let stack = UIStackView(arrangedSubviews: [plusButton, emailField, passwordField, fullnameField, usernameField, signUpButton])
+        let stack = UIStackView(arrangedSubviews: [emailField, passwordField, fullnameField, usernameField, signUpButton])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 20
         
         view.addSubview(stack)
-        stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
+        stack.topAnchor.constraint(equalTo: plusButton.bottomAnchor, constant: 15).isActive = true
         stack.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         stack.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -32).isActive = true
         
