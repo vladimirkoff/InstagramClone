@@ -11,6 +11,9 @@ class SignupController: UIViewController, FormViewModel {
    
     //MARK: - Properies
     
+    weak var delegate: AuthDelegate?  // avoiding retain cycle
+
+    
     var viewModel = RegistrationViewModel()
     
     private let plusButton: UIButton = {
@@ -54,6 +57,7 @@ class SignupController: UIViewController, FormViewModel {
         button.heightAnchor.constraint(equalToConstant: 50).isActive = true
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         button.isEnabled = false
+        button.addTarget(self, action: #selector(registerUser), for: .touchUpInside)
         return button
     }()
     
@@ -112,6 +116,21 @@ class SignupController: UIViewController, FormViewModel {
     }
     
     //MARK: - Selectors
+    
+    @objc func registerUser() {
+        guard let email = emailField.text else { return }
+        guard let password = passwordField.text else { return }
+        guard let fullname = fullnameField.text else { return }
+        guard let username = usernameField.text else { return }
+        
+        let userCreds = AuthCreds(email: email, password: password, fullname: fullname, username: username, profileImage: plusButton.imageView?.image ?? UIImage(named: "profile_selected"))
+        AuthService.registerUser(creds: userCreds) { error in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+            self.delegate?.authComplete()
+        }
+    }
     
     @objc func goToSignin() {
         navigationController?.popViewController(animated: true)

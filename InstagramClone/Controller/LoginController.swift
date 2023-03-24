@@ -6,6 +6,11 @@
 //
 
 import UIKit
+import FirebaseAuth
+
+protocol AuthDelegate: class {
+    func authComplete()
+}
 
 class LoginController: UIViewController, FormViewModel {
     func updateForm() {
@@ -16,6 +21,8 @@ class LoginController: UIViewController, FormViewModel {
     
     
     //MARK: - Proeprties
+    
+    weak var delegate: AuthDelegate?  // avoiding retain cycle
     
     private var viewModel = LoginViewModel()
     
@@ -57,6 +64,7 @@ class LoginController: UIViewController, FormViewModel {
         button.heightAnchor.constraint(equalToConstant: 50).isActive = true
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         button.isEnabled = false
+        button.addTarget(self, action: #selector(logIn), for: .touchUpInside)
         return button
     }()
     
@@ -104,6 +112,7 @@ class LoginController: UIViewController, FormViewModel {
     
     @objc func goToSignup() {  
         let vc = SignupController()
+        vc.delegate = delegate
         navigationController?.pushViewController(vc, animated: true)
     }
     @objc func textDidChange(sender: UITextField) {
@@ -113,6 +122,17 @@ class LoginController: UIViewController, FormViewModel {
             viewModel.password = sender.text
         }
         updateForm()
+    }
+    
+    @objc func logIn() {
+        guard let email = emailField.text else { return }
+        guard let password = passwordField.text else { return }
+        Auth.auth().signIn(withEmail: email, password: password) { res, err in
+            if let error = err {
+                print("Error logging in - \(error.localizedDescription)")
+                return
+            }
+            self.delegate?.authComplete()         }
     }
 }
 

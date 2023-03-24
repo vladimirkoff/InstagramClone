@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 private let reuseIdentifier = "Cell"
 
@@ -20,6 +21,11 @@ class FeedController: UICollectionViewController {
     
     func configureUI() {
         collectionView.register(PostCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Log out", style: .plain, target: self, action: #selector(logOut))
+        navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 20)
+        navigationItem.title = "Feed"
+       
     }
 }
 
@@ -37,6 +43,24 @@ extension FeedController {
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("SELECTED")
+    }
+    
+    //MARK: - Selectors
+    
+    @objc func logOut() {
+        do {
+            try Auth.auth().signOut()
+            let controller = LoginController()
+            let nav = UINavigationController(rootViewController: controller)
+            nav.modalPresentationStyle = .fullScreen
+            self.present(nav, animated: true)
+        } catch {
+            print("Error logging out - \(error.localizedDescription)")
+        }
+        
+        
+        
+        
     }
     
 }
