@@ -10,7 +10,11 @@ import UIKit
 class UserCell: UITableViewCell {
     //MARK: - Properties
     
-    private let profileImage: UIImageView = {
+    var viewModel: UserCellViewModel? {
+        didSet { configure() }
+    }
+    
+    let profileImage: UIImageView = {
         let iv = UIImageView()
         iv.backgroundColor = .lightGray
         iv.image = UIImage(named: "venom-7")
@@ -20,7 +24,7 @@ class UserCell: UITableViewCell {
         return iv
     }()
     
-    private var usernameLabel: UILabel = {
+    var usernameLabel: UILabel = {
         let label = UILabel()
         label.text = "vladimir"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -28,7 +32,7 @@ class UserCell: UITableViewCell {
         return label
     }()
     
-    private var nameLabel: UILabel = {
+    var nameLabel: UILabel = {
         let label = UILabel()
         label.text = "Vladimir Kovalev"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -68,5 +72,13 @@ class UserCell: UITableViewCell {
         stack.leftAnchor.constraint(equalTo: profileImage.rightAnchor, constant: 8).isActive = true
         stack.topAnchor.constraint(equalTo: self.topAnchor, constant: 8).isActive = true
         stack.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -6).isActive = true
+    }
+    
+    func configure() {
+        guard let viewModel = viewModel else { return }
+        
+        profileImage.sd_setImage(with: viewModel.profileImageUrl)
+        usernameLabel.text = viewModel.username
+        nameLabel.text = viewModel.fullName
     }
 }

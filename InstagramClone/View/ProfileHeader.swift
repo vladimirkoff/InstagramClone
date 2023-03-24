@@ -8,6 +8,10 @@
 import UIKit
 import SDWebImage
 
+protocol ProfileHeaderDelegate: class {
+    func header(_ profileHeader: ProfileHeader, didTapActionButton forUser: User)
+}
+
 class ProfileHeader: UICollectionReusableView {
     //MARK: - Properties
     
@@ -16,6 +20,8 @@ class ProfileHeader: UICollectionReusableView {
             configure()
         }
     }
+    
+    weak var delegate: ProfileHeaderDelegate?
     
     private let profileImage: UIImageView = {
         let iv = UIImageView()
@@ -157,6 +163,8 @@ class ProfileHeader: UICollectionReusableView {
         underline.bottomAnchor.constraint(equalTo: buttonStack.topAnchor, constant: -15).isActive = true
         underline.widthAnchor.constraint(equalToConstant: self.frame.width).isActive = true
         underline.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        
+        
     }
     
     func attributedLabel(value: Int, label: String) -> NSAttributedString {
@@ -169,11 +177,16 @@ class ProfileHeader: UICollectionReusableView {
         guard let viewModel = viewModel else { return }
         nameLabel.text = viewModel.fullName
         profileImage.sd_setImage(with: URL(string: viewModel.profileImageUrl))
+        
+        editPorfileFollowButton.setTitle(viewModel.followButtonText, for: .normal)
+        editPorfileFollowButton.setTitleColor(viewModel.followButtonTextColor, for: .normal)
+        editPorfileFollowButton.backgroundColor = viewModel.followButtonColor
     }
     
     //MARK: - Selectors
     
     @objc func editProfileFollowTapped() {
-        print("DEBUG: edit profile button pressed")
+        guard let viewModel = viewModel else { return }
+        delegate?.header(self, didTapActionButton: viewModel.user)
     }
 }
