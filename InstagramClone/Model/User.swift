@@ -18,6 +18,8 @@ struct User {
     var isCurrentUser: Bool {
         return Auth.auth().currentUser?.uid == uid ? true : false
     }
+    var numberOfFollowers = 0
+    var numberOfFollowing = 0
     
     
     init(dictionary: [String: Any]) {

@@ -16,8 +16,7 @@ class ProfileController: UICollectionViewController {
     //MARK: - Properties
     
     private var user: User
-    
-    
+        
     //MARK: - Lifecycle
     
     init(user: User) {
@@ -33,13 +32,24 @@ class ProfileController: UICollectionViewController {
         super.viewDidLoad()
         view.backgroundColor = .orange
         configureUI()
-       
     }
     
     //MARK: - Helper
     
     func configureUI() {
         collectionView.backgroundColor = .white
+        UserService.checkIfFollowed(uid: user.uid, completion: { [weak self] isFollowed in
+            self?.user.isFollowed = isFollowed
+            self?.collectionView.reloadData()
+        })
+        UserService.getNumberOfFollowers(uid: user.uid) { [weak self] num in
+            self?.user.numberOfFollowers = num
+            self?.collectionView.reloadData()
+        }
+        UserService.getNumberOfFollowing(uid: user.uid) { [weak self] num in
+            self?.user.numberOfFollowing = num
+            self?.collectionView.reloadData()
+        }
         
         collectionView.register(ProfileCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         collectionView.register(ProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerIdentifier) // registerring header
@@ -61,6 +71,8 @@ extension ProfileController {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerIdentifier, for: indexPath) as! ProfileHeader
             header.viewModel = ProfileHeaderViewModel(user: user)
         header.delegate = self
+        header.numberOfFollowing = user.numberOfFollowing
+        header.numberOfFollowers = user.numberOfFollowers
         return header
     }
 }
@@ -95,13 +107,22 @@ extension ProfileController: ProfileHeaderDelegate {
         if user.isCurrentUser {
             print("Edit profile")
         } else if user.isFollowed {
-            print(" unfollow")
-        } else {
-            UserService.follow(uid: user.uid) { error in
+            UserService.unfollow(uid: user.uid) { [weak self] error in
                 if let error = error {
                     print("Error following user - \(error.localizedDescription)")
                 }
-                print("Succesfully followed!")
+                self?.user.isFollowed = false
+                self?.user.numberOfFollowers -= 1
+                self?.collectionView.reloadData()
+            }
+        } else {
+            UserService.follow(uid: user.uid) { [weak self] error  in
+                if let error = error {
+                    print("Error following user - \(error.localizedDescription)")
+                }
+                self?.user.isFollowed = true
+                self?.user.numberOfFollowers += 1
+                self?.collectionView.reloadData()
             }
         }
     }

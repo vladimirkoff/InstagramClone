@@ -37,6 +37,9 @@
 		85D9C11129CAF5330023C400 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D9C11029CAF5330023C400 /* Extensions.swift */; };
 		85D9C11329CAFE2C0023C400 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D9C11229CAFE2C0023C400 /* AuthViewModel.swift */; };
 		85E2278829CB518500A19821 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 85E2278729CB518500A19821 /* GoogleService-Info.plist */; };
+		85FD7D3A29CEE86D009A8473 /* UploadPostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FD7D3929CEE86D009A8473 /* UploadPostController.swift */; };
+		85FD7D3C29CEF366009A8473 /* InputTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FD7D3B29CEF366009A8473 /* InputTextView.swift */; };
+		85FD7D4029CEF835009A8473 /* PostService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FD7D3F29CEF835009A8473 /* PostService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +77,9 @@
 		85D9C11029CAF5330023C400 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		85D9C11229CAFE2C0023C400 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		85E2278729CB518500A19821 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		85FD7D3929CEE86D009A8473 /* UploadPostController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPostController.swift; sourceTree = "<group>"; };
+		85FD7D3B29CEF366009A8473 /* InputTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputTextView.swift; sourceTree = "<group>"; };
+		85FD7D3F29CEF835009A8473 /* PostService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +155,7 @@
 				852A7C6329CC371C00C75191 /* ImageUploader.swift */,
 				852A7C6529CC372300C75191 /* AuthService.swift */,
 				852A7C6F29CDC4D500C75191 /* UserService.swift */,
+				85FD7D3F29CEF835009A8473 /* PostService.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -164,6 +171,7 @@
 				85D9C0DA29C9C2FF0023C400 /* NotificationsController.swift */,
 				85D9C10A29CAE8280023C400 /* LoginController.swift */,
 				85D9C10C29CAE8320023C400 /* SignupController.swift */,
+				85FD7D3929CEE86D009A8473 /* UploadPostController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -186,6 +194,7 @@
 				852A7C6929CDA56900C75191 /* ProfileCell.swift */,
 				852A7C6B29CDA57300C75191 /* ProfileHeader.swift */,
 				852A7C7329CDD98C00C75191 /* UserCell.swift */,
+				85FD7D3B29CEF366009A8473 /* InputTextView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -334,6 +343,7 @@
 			files = (
 				85D9C10F29CAF30D0023C400 /* CustomTextField.swift in Sources */,
 				85D9C10B29CAE8280023C400 /* LoginController.swift in Sources */,
+				85FD7D3A29CEE86D009A8473 /* UploadPostController.swift in Sources */,
 				85D9C0D729C9C2EB0023C400 /* ProfileController.swift in Sources */,
 				85D9C0D929C9C2F70023C400 /* PostController.swift in Sources */,
 				85D9C10D29CAE8320023C400 /* SignupController.swift in Sources */,
@@ -342,6 +352,7 @@
 				851BEC2829C8687F00691376 /* ViewController.swift in Sources */,
 				852A7C7429CDD98C00C75191 /* UserCell.swift in Sources */,
 				85D9C0DB29C9C2FF0023C400 /* NotificationsController.swift in Sources */,
+				85FD7D3C29CEF366009A8473 /* InputTextView.swift in Sources */,
 				852A7C6C29CDA57300C75191 /* ProfileHeader.swift in Sources */,
 				85D9C0D529C9C2D90023C400 /* SearchController.swift in Sources */,
 				851BEC2429C8687F00691376 /* AppDelegate.swift in Sources */,
@@ -353,6 +364,7 @@
 				852A7C6429CC371C00C75191 /* ImageUploader.swift in Sources */,
 				852A7C6629CC372300C75191 /* AuthService.swift in Sources */,
 				852A7C6A29CDA56900C75191 /* ProfileCell.swift in Sources */,
+				85FD7D4029CEF835009A8473 /* PostService.swift in Sources */,
 				85D9C10929CA0B810023C400 /* PostCell.swift in Sources */,
 				85D9C11129CAF5330023C400 /* Extensions.swift in Sources */,
 				852A7C6829CC3C6E00C75191 /* Constants.swift in Sources */,

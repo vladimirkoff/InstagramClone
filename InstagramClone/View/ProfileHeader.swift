@@ -21,6 +21,17 @@ class ProfileHeader: UICollectionReusableView {
         }
     }
     
+    var numberOfFollowers: Int? {
+        didSet {
+            configure()
+        }
+    }
+    var numberOfFollowing: Int? {
+        didSet {
+            configure()
+        }
+    }
+        
     weak var delegate: ProfileHeaderDelegate?
     
     private let profileImage: UIImageView = {
@@ -42,7 +53,7 @@ class ProfileHeader: UICollectionReusableView {
     lazy private var editPorfileFollowButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Edit profile", for: .normal)
+        button.setTitle("Loading", for: .normal)
         button.layer.cornerRadius = 3
         button.layer.borderColor = UIColor.lightGray.cgColor
         button.layer.borderWidth = 1
@@ -63,7 +74,7 @@ class ProfileHeader: UICollectionReusableView {
         let label = UILabel()
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.attributedText = attributedLabel(value: 1, label: "Followers")
+        label.attributedText = attributedLabel(value: 0, label: "Followers")
         return label
     }()
     
@@ -71,7 +82,7 @@ class ProfileHeader: UICollectionReusableView {
         let label = UILabel()
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.attributedText = attributedLabel(value: 2, label: "Following")
+        label.attributedText = attributedLabel(value: 0, label: "Following")
         return label
     }()
     
@@ -181,6 +192,8 @@ class ProfileHeader: UICollectionReusableView {
         editPorfileFollowButton.setTitle(viewModel.followButtonText, for: .normal)
         editPorfileFollowButton.setTitleColor(viewModel.followButtonTextColor, for: .normal)
         editPorfileFollowButton.backgroundColor = viewModel.followButtonColor
+        followersLabel.attributedText = attributedLabel(value: numberOfFollowers ?? 0, label: "Followers")
+        followingLabel.attributedText = attributedLabel(value: numberOfFollowing ?? 0, label: "Following")
     }
     
     //MARK: - Selectors

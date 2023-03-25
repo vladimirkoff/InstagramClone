@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseAuth
+import YPImagePicker
 
 class MainTabController: UITabBarController {
     
@@ -19,9 +20,14 @@ class MainTabController: UITabBarController {
     }
     
     //MARK: - Lifecycle
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.selectedIndex = 0
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .red
+        view.backgroundColor = .white
         checkIfLoggedIn()
         fetchUser()
     }
@@ -51,6 +57,7 @@ class MainTabController: UITabBarController {
     //MARK: - Helpers
     
     func configureVC(with user: User) {
+        self.delegate = self
         
         
         let feed = templateNavController(unselectedImage: UIImage(named: "home_unselected")!, selectedImage: UIImage(named: "home_selected")!, rootVC: FeedController(collectionViewLayout: UICollectionViewFlowLayout()))
@@ -77,7 +84,21 @@ class MainTabController: UITabBarController {
         return nav
     }
     
-}
+    open func didFinishChoosingMedia(picker: YPImagePicker) {
+        picker.didFinishPicking { [weak self] items, cancelled in  // executes when we click "Finish"
+            picker.dismiss(animated: true) {
+                guard let selectedImage = items.singlePhoto?.image else { return }
+                let imageData = selectedImage.jpegData(compressionQuality: 0.7)
+                
+                let vc = UploadPostController()
+                vc.imageData = imageData
+                self?.navigationController?.pushViewController(vc, animated: true)
+            }
+            }
+        }
+    }
+    
+
 
 extension MainTabController: AuthDelegate {
     func authComplete() {
@@ -85,3 +106,28 @@ extension MainTabController: AuthDelegate {
         self.dismiss(animated: true)
     }
 }
+
+extension MainTabController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        let index = viewControllers?.firstIndex(of: viewController)  // returns the index of the selected vc
+        if index == 2 {
+            var config = YPImagePickerConfiguration()
+            config.library.mediaType = .photo
+            config.shouldSaveNewPicturesToAlbum = false // does not save the post to the camera roll after posting
+            config.startOnScreen = .library
+            config.screens = [.library]
+            config.hidesStatusBar = false
+            config.hidesBottomBar = false
+            config.library.maxNumberOfItems = 1
+            
+            let picker = YPImagePicker(configuration: config)
+            picker.modalPresentationStyle = .fullScreen
+            present(picker, animated: true)
+            
+            didFinishChoosingMedia(picker: picker)
+        }
+        return true
+    }
+}
+
+

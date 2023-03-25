@@ -45,7 +45,40 @@ struct UserService {  // fetching user information
             COLLECTION_FOLLOWERS.document(uid).collection("user-followers").document(currentUid).setData([:], completion: completion)
         }
     }
-    static func unfollow() {
+    static func unfollow(uid: String, completion: @escaping(FirestoreCompletion)) {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        
+        COLLECTION_FOLLOWING.document(currentUid).collection("user-following").document(uid).delete {  error in
+            if let error = error {
+                print("Error unfollowing user = \(error.localizedDescription)")
+                return
+            }
+            COLLECTION_FOLLOWERS.document(uid).collection("user-followers").document(currentUid).delete(completion: completion
+        )}
+    }
+    static func checkIfFollowed(uid: String, completion: @escaping(Bool) -> ()) {
+        guard let currentUid = Auth.auth().currentUser?.uid else { return }
+        
+        COLLECTION_FOLLOWING.document(currentUid).collection("user-following").document(uid).getDocument { snapshot, error in
+            guard let isFollowed = snapshot?.exists else { return }
+            completion(isFollowed)
+        }
+    }
+    
+    static func getNumberOfFollowers(uid: String, completion: @escaping(Int) -> ()) {
+        COLLECTION_FOLLOWERS.document(uid).collection("user-followers").getDocuments { snapshot, error in
+            guard let num = snapshot?.documents.count else { return }
+            completion(num)
+        }
+    }
+    
+    static func getNumberOfFollowing(uid: String, completion: @escaping(Int) -> ()) {
+        COLLECTION_FOLLOWING.document(uid).collection("user-following").getDocuments { snapshot, error in
+            guard let num = snapshot?.documents.count else { return }
+            completion(num)
+        }
+    }
+        
         
     }
-}
+

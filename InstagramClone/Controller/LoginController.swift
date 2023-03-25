@@ -110,7 +110,7 @@ class LoginController: UIViewController, FormViewModel {
     
     //MARK: - Selectors
     
-    @objc func goToSignup() {  
+    @objc func goToSignup() {
         let vc = SignupController()
         vc.delegate = delegate
         navigationController?.pushViewController(vc, animated: true)
@@ -132,7 +132,9 @@ class LoginController: UIViewController, FormViewModel {
                 print("Error logging in - \(error.localizedDescription)")
                 return
             }
-            self.delegate?.authComplete()         }
+            self.delegate?.authComplete()
+            
+        }
     }
 }
 

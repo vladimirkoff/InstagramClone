@@ -12,6 +12,7 @@ import UIKit
 struct ProfileHeaderViewModel {
     
     let user: User
+    
     var fullName: String {
         return user.fullName
     }
@@ -23,9 +24,7 @@ struct ProfileHeaderViewModel {
         if user.uid == Auth.auth().currentUser?.uid {
             return  "Edit profile"
         }
-        
         return user.isFollowed ? "Unfollow" : "Follow"
-
     }
     
     var followButtonColor: UIColor {
