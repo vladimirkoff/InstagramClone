@@ -118,7 +118,7 @@ class SignupController: UIViewController, FormViewModel {
     //MARK: - Selectors
     
     @objc func registerUser() {
-        guard let email = emailField.text else { return }
+        guard let email = emailField.text?.lowercased() else { return }
         guard let password = passwordField.text else { return }
         guard let fullname = fullnameField.text else { return }
         guard let username = usernameField.text else { return }

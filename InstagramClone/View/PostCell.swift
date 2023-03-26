@@ -11,10 +11,9 @@ class PostCell: UICollectionViewCell {
     
     //MARK: - Properties
     
-    private let profileImage: UIImageView = {
+    var profileImage: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.image = UIImage(named: "venom-7")
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         iv.backgroundColor = .systemPurple
@@ -25,20 +24,18 @@ class PostCell: UICollectionViewCell {
     private lazy var usernameButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("venom", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
         button.addTarget(self, action: #selector(didTapUsername), for: .touchUpInside)
         return button
     }()
     
-    private let postImage: UIImageView = {
+     var postImage: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.image = UIImage(named: "venom-7")
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.backgroundColor = .systemPurple
+        iv.backgroundColor = .lightGray
         iv.isUserInteractionEnabled = true
         return iv
     }()
@@ -72,15 +69,14 @@ class PostCell: UICollectionViewCell {
         let label = UILabel()
         label.text = "1 like"
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.boldSystemFont(ofSize: 12)
+        label.font = UIFont.boldSystemFont(ofSize: 14)
         return label
     }()
     
-    private let captionLabel: UILabel = {
+     var captionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Some test caption for now..."
-        label.font = UIFont.boldSystemFont(ofSize: 12)
+        label.font = UIFont.systemFont(ofSize: 14)
         return label
     }()
     
@@ -92,6 +88,20 @@ class PostCell: UICollectionViewCell {
         label.textColor = .lightGray
         return label
     }()
+    
+    var usernameLabel: UILabel = {
+       let label = UILabel()
+       label.translatesAutoresizingMaskIntoConstraints = false
+       label.font = UIFont.boldSystemFont(ofSize: 14)
+       return label
+   }()
+    
+    var upperusernameLabel: UILabel = {
+       let label = UILabel()
+       label.translatesAutoresizingMaskIntoConstraints = false
+       label.font = UIFont.boldSystemFont(ofSize: 14)
+       return label
+   }()
         
     //MARK: - Lifecycle
     
@@ -131,13 +141,21 @@ class PostCell: UICollectionViewCell {
         likesLabel.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 10).isActive = true
         likesLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 10).isActive = true
         
+        addSubview(usernameLabel)
+        usernameLabel.topAnchor.constraint(equalTo: likesLabel.bottomAnchor, constant: 8).isActive = true
+        usernameLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
+
         addSubview(captionLabel)
         captionLabel.topAnchor.constraint(equalTo: likesLabel.bottomAnchor, constant: 8).isActive = true
-        captionLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
+        captionLabel.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor, constant: 4).isActive = true
         
         addSubview(postTimeLabel)
         postTimeLabel.topAnchor.constraint(equalTo: captionLabel.bottomAnchor, constant: 8).isActive = true
         postTimeLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
+        
+        addSubview(upperusernameLabel)
+        upperusernameLabel.leftAnchor.constraint(equalTo: profileImage.rightAnchor, constant: 4).isActive = true
+        upperusernameLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 12).isActive = true
     }
     
     

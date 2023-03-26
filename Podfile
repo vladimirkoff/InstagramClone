@@ -13,5 +13,6 @@ target 'InstagramClone' do
   pod 'FirebaseDatabase'
   pod 'SDWebImage', '~> 5.0'
   pod 'YPImagePicker'
+  pod 'JGProgressHUD'
   
 end

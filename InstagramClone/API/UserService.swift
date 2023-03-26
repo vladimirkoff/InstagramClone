@@ -28,7 +28,7 @@ struct UserService {  // fetching user information
     static func fetchUsers(completion:@escaping([User])->()){
         COLLECTION_USERS.getDocuments { snapshot, err in
             guard let snapshot = snapshot else { return }
-       
+            
             let users = snapshot.documents.map({User(dictionary: $0.data())})  // loops through the list of users
             completion(users)
         }
@@ -54,7 +54,7 @@ struct UserService {  // fetching user information
                 return
             }
             COLLECTION_FOLLOWERS.document(uid).collection("user-followers").document(currentUid).delete(completion: completion
-        )}
+            )}
     }
     static func checkIfFollowed(uid: String, completion: @escaping(Bool) -> ()) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
@@ -78,7 +78,16 @@ struct UserService {  // fetching user information
             completion(num)
         }
     }
-        
-        
+    static func fetchUser(by uid: String, completion: @escaping(User) -> ()) {
+        COLLECTION_USERS.document(uid).getDocument { snapshot, err in
+            guard let dictionary: [String: Any] = snapshot?.data() else { return }
+            if let error = err {
+                print("Error fetching user - \(error)")
+                return
+            }
+            let user = User(dictionary: dictionary)
+            completion(user)
+        }
     }
+}
 

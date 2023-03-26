@@ -40,6 +40,8 @@
 		85FD7D3A29CEE86D009A8473 /* UploadPostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FD7D3929CEE86D009A8473 /* UploadPostController.swift */; };
 		85FD7D3C29CEF366009A8473 /* InputTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FD7D3B29CEF366009A8473 /* InputTextView.swift */; };
 		85FD7D4029CEF835009A8473 /* PostService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FD7D3F29CEF835009A8473 /* PostService.swift */; };
+		85FD7D4229CF0045009A8473 /* PostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FD7D4129CF0045009A8473 /* PostViewModel.swift */; };
+		85FD7D4429CF0B5D009A8473 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FD7D4329CF0B5D009A8473 /* Post.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +82,8 @@
 		85FD7D3929CEE86D009A8473 /* UploadPostController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadPostController.swift; sourceTree = "<group>"; };
 		85FD7D3B29CEF366009A8473 /* InputTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputTextView.swift; sourceTree = "<group>"; };
 		85FD7D3F29CEF835009A8473 /* PostService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostService.swift; sourceTree = "<group>"; };
+		85FD7D4129CF0045009A8473 /* PostViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostViewModel.swift; sourceTree = "<group>"; };
+		85FD7D4329CF0B5D009A8473 /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +186,7 @@
 				85D9C11229CAFE2C0023C400 /* AuthViewModel.swift */,
 				852A7C7129CDCA4200C75191 /* ProfileHeaderViewModel.swift */,
 				852A7C7529CDF9C600C75191 /* UserCellViewModel.swift */,
+				85FD7D4129CF0045009A8473 /* PostViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -203,6 +208,7 @@
 			isa = PBXGroup;
 			children = (
 				852A7C6D29CDC46E00C75191 /* User.swift */,
+				85FD7D4329CF0B5D009A8473 /* Post.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -350,6 +356,7 @@
 				85D9C11329CAFE2C0023C400 /* AuthViewModel.swift in Sources */,
 				852A7C7029CDC4D500C75191 /* UserService.swift in Sources */,
 				851BEC2829C8687F00691376 /* ViewController.swift in Sources */,
+				85FD7D4429CF0B5D009A8473 /* Post.swift in Sources */,
 				852A7C7429CDD98C00C75191 /* UserCell.swift in Sources */,
 				85D9C0DB29C9C2FF0023C400 /* NotificationsController.swift in Sources */,
 				85FD7D3C29CEF366009A8473 /* InputTextView.swift in Sources */,
@@ -365,6 +372,7 @@
 				852A7C6629CC372300C75191 /* AuthService.swift in Sources */,
 				852A7C6A29CDA56900C75191 /* ProfileCell.swift in Sources */,
 				85FD7D4029CEF835009A8473 /* PostService.swift in Sources */,
+				85FD7D4229CF0045009A8473 /* PostViewModel.swift in Sources */,
 				85D9C10929CA0B810023C400 /* PostCell.swift in Sources */,
 				85D9C11129CAF5330023C400 /* Extensions.swift in Sources */,
 				852A7C6829CC3C6E00C75191 /* Constants.swift in Sources */,

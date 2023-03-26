@@ -19,4 +19,13 @@ struct PostService {
             COLLECTION_POSTS.addDocument(data: data, completion: completion)
         }
     }
+    
+    static func fetchPosts(completion: @escaping([Post]) -> ()) {
+        COLLECTION_POSTS.order(by: "timestamp", descending: true).getDocuments {  snapshot, err in
+            let posts = snapshot?.documents.map({Post(dictionary: $0.data())})
+            if let posts = posts {
+                completion(posts)
+            }
+        }
+    }
 }

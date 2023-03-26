@@ -7,13 +7,15 @@
 
 import UIKit
 import YPImagePicker
-
+import JGProgressHUD
 
 
 class UploadPostController: UIViewController {
     //MARK: - Properties
     
     var imageData: Data?
+    
+    let hud = JGProgressHUD(style: .dark)
     
     
     private let postImage: UIImageView = {
@@ -63,6 +65,7 @@ class UploadPostController: UIViewController {
     
     func configureUI() {
         navigationItem.title = "Post"
+        textView.delegate = self
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action:    #selector(cancelPressed))
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Share", style: .done, target: self, action: #selector(sharePressed))
@@ -90,6 +93,17 @@ class UploadPostController: UIViewController {
         numberOfSymbols.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8).isActive = true
     }
     
+    func showLoader(_ show: Bool) {
+        view.endEditing(true )
+        
+        if show {
+            self.hud.show(in: view)
+        } else {
+            self.hud.dismiss()
+        }
+    }
+    
+    
     //MARK: - Selectors
     
     @objc func cancelPressed() {
@@ -99,14 +113,25 @@ class UploadPostController: UIViewController {
     @objc func sharePressed() {
         guard let image = postImage.image else { return }
         guard let caption = textView.text else { return }
-        self.navigationController?.popViewController(animated: true)
-        PostService.uploadPost(caption: caption, image: image) { error in
+        showLoader(true)
+        
+        PostService.uploadPost(caption: caption, image: image) { [weak self] error in
+            self?.showLoader(false)
             if let error = error {
                 print("ERROR uploadding post = \(error.localizedDescription)")
                 return
             }
+            self?.navigationController?.popViewController(animated: true)
         }
     }
-    
+}
+
+//MARK: - UITextViewDelegate
+
+extension UploadPostController: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        let num = textView.text.count
+        numberOfSymbols.text = "\(num)/100"
+    }
 }
 

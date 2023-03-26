@@ -53,6 +53,17 @@ class ProfileController: UICollectionViewController {
         
         collectionView.register(ProfileCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         collectionView.register(ProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerIdentifier) // registerring header
+        
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        collectionView.refreshControl = refreshControl
+    }
+    
+    //MARK: - Selectors
+    
+    @objc func handleRefresh() {
+        collectionView.reloadData()
+        self.collectionView.refreshControl?.endRefreshing()
     }
 }
 

@@ -94,10 +94,10 @@ class MainTabController: UITabBarController {
                 vc.imageData = imageData
                 self?.navigationController?.pushViewController(vc, animated: true)
             }
-            }
         }
     }
-    
+}
+
 
 
 extension MainTabController: AuthDelegate {
