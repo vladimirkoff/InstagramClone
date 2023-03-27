@@ -89,5 +89,11 @@ struct UserService {  // fetching user information
             completion(user)
         }
     }
+    static func getNumberOfPosts(with uid: String, completion: @escaping(Int) -> ()) {
+        COLLECTION_USER_POSTS.document(uid).collection("posts").getDocuments { snapshot, error in
+            guard let snapshot = snapshot else { return }
+            completion(snapshot.count)
+        }
+    }
 }
 

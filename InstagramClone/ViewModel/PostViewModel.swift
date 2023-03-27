@@ -22,8 +22,7 @@ struct PostViewModel {
     var upperUsername: String? {
         return user.username
     }
-    
-    
+
     init(user: User) {
         self.user = user
     }

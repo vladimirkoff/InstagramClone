@@ -41,7 +41,6 @@ class MainTabController: UITabBarController {
                 controller.delegate = self
                 let nav = UINavigationController(rootViewController: controller)
                 nav.modalPresentationStyle = .fullScreen
-                
                 self.present(nav, animated: true, completion: nil)
             }
             

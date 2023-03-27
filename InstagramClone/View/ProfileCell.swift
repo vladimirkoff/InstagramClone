@@ -10,7 +10,7 @@ import UIKit
 class ProfileCell: UICollectionViewCell {
     //MARK: - Properties
     
-    private let postImage: UIImageView = {
+    var postImage: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill

@@ -7,9 +7,17 @@
 
 import UIKit
 
+protocol PostCellDelegate: class {
+    func showOptions()
+    func test(caption: String, image: UIImage)  // saving post
+    func usernameTapped()
+}
+
 class PostCell: UICollectionViewCell {
     
     //MARK: - Properties
+    
+    weak var delegate: PostCellDelegate?
     
     var profileImage: UIImageView = {
         let iv = UIImageView()
@@ -21,7 +29,7 @@ class PostCell: UICollectionViewCell {
         return iv
     }()
     
-    private lazy var usernameButton: UIButton = {
+     lazy var usernameButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitleColor(.black, for: .normal)
@@ -45,6 +53,7 @@ class PostCell: UICollectionViewCell {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "like_unselected"), for: .normal)
         button.tintColor = .black
+        button.addTarget(self, action: #selector(didTapLike), for: .touchUpInside)
         return button
     }()
     
@@ -95,13 +104,18 @@ class PostCell: UICollectionViewCell {
        label.font = UIFont.boldSystemFont(ofSize: 14)
        return label
    }()
+
     
-    var upperusernameLabel: UILabel = {
-       let label = UILabel()
-       label.translatesAutoresizingMaskIntoConstraints = false
-       label.font = UIFont.boldSystemFont(ofSize: 14)
-       return label
-   }()
+
+    
+    lazy private var optionsButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "dots"), for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(optionsButtonPressed), for: .touchUpInside)
+        button.frame = CGRect(x: 0, y: 0, width: 10, height: 2)
+        return button
+    }()
         
     //MARK: - Lifecycle
     
@@ -153,9 +167,16 @@ class PostCell: UICollectionViewCell {
         postTimeLabel.topAnchor.constraint(equalTo: captionLabel.bottomAnchor, constant: 8).isActive = true
         postTimeLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
         
-        addSubview(upperusernameLabel)
-        upperusernameLabel.leftAnchor.constraint(equalTo: profileImage.rightAnchor, constant: 4).isActive = true
-        upperusernameLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 12).isActive = true
+//        addSubview(upperusernameLabel)
+//        upperusernameLabel.leftAnchor.constraint(equalTo: profileImage.rightAnchor, constant: 4).isActive = true
+//        upperusernameLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 12).isActive = true
+        
+        addSubview(optionsButton)
+        optionsButton.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor).isActive = true
+        optionsButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -10).isActive = true
+        optionsButton.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        optionsButton.heightAnchor.constraint(equalToConstant: 25).isActive = true
+        optionsButton.tintColor = .black
     }
     
     
@@ -167,11 +188,18 @@ class PostCell: UICollectionViewCell {
     //MARK: - Selectors
     
     @objc func didTapUsername() {
-        print("DEBIG: tapped username")
+        delegate?.usernameTapped()
+    }
+    
+    @objc func didTapLike() {
+        
     }
     
     @objc func commentTapped() {
-        print("DEBUG: Comment tapepd")
+        delegate?.test(caption: self.captionLabel.text!, image: self.postImage.image!)
+    }
+    @objc func optionsButtonPressed() {
+        delegate?.showOptions()
     }
     
     //MARK: - Helpers

@@ -20,6 +20,7 @@ struct User {
     }
     var numberOfFollowers = 0
     var numberOfFollowing = 0
+    var numberOfPosts = 0
     
     
     init(dictionary: [String: Any]) {

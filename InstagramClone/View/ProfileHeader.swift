@@ -8,8 +8,15 @@
 import UIKit
 import SDWebImage
 
+enum ProfileActions {
+    case list
+    case posts
+    case saved
+}
+
 protocol ProfileHeaderDelegate: class {
     func header(_ profileHeader: ProfileHeader, didTapActionButton forUser: User)
+    func profileActionTapped(action: ProfileActions)
 }
 
 class ProfileHeader: UICollectionReusableView {
@@ -26,7 +33,14 @@ class ProfileHeader: UICollectionReusableView {
             configure()
         }
     }
+    
     var numberOfFollowing: Int? {
+        didSet {
+            configure()
+        }
+    }
+    
+    var numberOfPosts: Int? {
         didSet {
             configure()
         }
@@ -90,6 +104,8 @@ class ProfileHeader: UICollectionReusableView {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "grid"), for: .normal)
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(postsTapped), for: .touchUpInside)
         return button
     }()
     
@@ -97,7 +113,8 @@ class ProfileHeader: UICollectionReusableView {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "ribbon"), for: .normal)
-
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(savedTapped), for: .touchUpInside)
         return button
     }()
     
@@ -105,8 +122,8 @@ class ProfileHeader: UICollectionReusableView {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "list"), for: .normal)
-
-     
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(listTapped), for: .touchUpInside)
         return button
     }()
     
@@ -114,6 +131,7 @@ class ProfileHeader: UICollectionReusableView {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .lightGray
+       
         return view
     }()
     
@@ -194,6 +212,7 @@ class ProfileHeader: UICollectionReusableView {
         editPorfileFollowButton.backgroundColor = viewModel.followButtonColor
         followersLabel.attributedText = attributedLabel(value: numberOfFollowers ?? 0, label: "Followers")
         followingLabel.attributedText = attributedLabel(value: numberOfFollowing ?? 0, label: "Following")
+        postsLabel.attributedText = attributedLabel(value: numberOfPosts ?? 0, label: "Posts")
     }
     
     //MARK: - Selectors
@@ -201,5 +220,17 @@ class ProfileHeader: UICollectionReusableView {
     @objc func editProfileFollowTapped() {
         guard let viewModel = viewModel else { return }
         delegate?.header(self, didTapActionButton: viewModel.user)
+    }
+    
+    @objc func listTapped() {
+        delegate?.profileActionTapped(action: .list)
+    }
+    
+    @objc func postsTapped() {
+        delegate?.profileActionTapped(action: .posts)
+    }
+    
+    @objc func savedTapped() {
+        delegate?.profileActionTapped(action: .saved)
     }
 }

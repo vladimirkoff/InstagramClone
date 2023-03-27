@@ -121,7 +121,13 @@ class UploadPostController: UIViewController {
                 print("ERROR uploadding post = \(error.localizedDescription)")
                 return
             }
-            self?.navigationController?.popViewController(animated: true)
+            PostService.uploadPostForUser(caption: caption, image: image) { error in
+                if let error = error {
+                    print("ERROR uploadding post = \(error.localizedDescription)")
+                    return
+                }
+                self?.navigationController?.popViewController(animated: true)
+            }
         }
     }
 }

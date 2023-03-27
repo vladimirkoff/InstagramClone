@@ -16,6 +16,8 @@ class ProfileController: UICollectionViewController {
     //MARK: - Properties
     
     private var user: User
+    private var posts: [Post]?
+    private var viewModel: PostViewModel?
         
     //MARK: - Lifecycle
     
@@ -28,10 +30,27 @@ class ProfileController: UICollectionViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        configureUI()
+        fetchPosts(uid: user.uid)
+        
+        navigationController?.navigationBar.barStyle = .default
+        navigationController?.navigationBar.isHidden = false
+       
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .orange
-        configureUI()
+    }
+    
+    //MARK: - API
+    
+    func fetchPosts(uid: String) {
+        PostService.fetchPostsForUser(with: uid) { [weak self] posts in
+            self?.posts = posts
+            self?.collectionView.reloadData()
+        }
     }
     
     //MARK: - Helper
@@ -48,6 +67,11 @@ class ProfileController: UICollectionViewController {
         }
         UserService.getNumberOfFollowing(uid: user.uid) { [weak self] num in
             self?.user.numberOfFollowing = num
+            self?.collectionView.reloadData()
+        }
+        
+        UserService.getNumberOfPosts(with: user.uid) { [weak self] num in
+            self?.user.numberOfPosts = num
             self?.collectionView.reloadData()
         }
         
@@ -72,10 +96,13 @@ class ProfileController: UICollectionViewController {
 extension ProfileController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ProfileCell
+        if let posts = posts {
+            cell.postImage.sd_setImage(with: URL(string: posts[indexPath.row].imageUrl))
+        }
         return cell
     }
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return posts?.count ?? 0
     }
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
@@ -84,7 +111,13 @@ extension ProfileController {
         header.delegate = self
         header.numberOfFollowing = user.numberOfFollowing
         header.numberOfFollowers = user.numberOfFollowers
+        header.numberOfPosts = user.numberOfPosts
         return header
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
@@ -114,9 +147,26 @@ extension ProfileController: UICollectionViewDelegateFlowLayout {
 //MARK: - ProfileHeaderDelegate
 
 extension ProfileController: ProfileHeaderDelegate {
+    
+    func profileActionTapped(action: ProfileActions) {
+        switch action {
+        case .list:
+            let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
+            navigationController?.pushViewController(vc, animated: true)
+        case .posts:
+            let vc = ProfileController(user: user)
+            navigationController?.pushViewController(vc, animated: true)
+        case .saved:
+            let vc = SavedController(user: user)
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
     func header(_ profileHeader: ProfileHeader, didTapActionButton forUser: User) {
         if user.isCurrentUser {
-            print("Edit profile")
+            let vc = EditProfileController()
+            
+            navigationController?.pushViewController(vc, animated: true)
         } else if user.isFollowed {
             UserService.unfollow(uid: user.uid) { [weak self] error in
                 if let error = error {
