@@ -14,19 +14,14 @@ struct PostService {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
         ImageUploader.uploadImage(image: image) { imageUrl in
-            let data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid  ]
+            let uuid = UUID().uuidString
+            var data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid, "postId": uuid]
+            COLLECTION_POSTS.document(uuid).setData(data, completion: completion)
             
-            COLLECTION_POSTS.addDocument(data: data, completion: completion)
-        }
-    }
-    
-    static func uploadPostForUser(caption: String, image: UIImage, completion: @escaping(FirestoreCompletion)) {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        
-        ImageUploader.uploadImage(image: image) { imageUrl in
-            let data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid  ]
-            
-            COLLECTION_USER_POSTS.document(uid).collection("posts").addDocument(data: data, completion: completion)
+            ImageUploader.uploadImage(image: image) { imageUrl in
+                let data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid, "postId": uuid]
+                COLLECTION_USER_POSTS.document(uid).collection("posts").document(uuid).setData(data, completion: completion)
+            }
         }
     }
     
@@ -36,6 +31,7 @@ struct PostService {
                 print("Error fetching posts - \(error.localizedDescription)")
                 return
             }
+            
             let posts = snapshot?.documents.map({Post(dictionary: $0.data())})
             if let posts = posts {
                 completion(posts)
@@ -55,13 +51,22 @@ struct PostService {
         }
     }
     
-    static func addToSaved(caption: String, image: UIImage, completion: @escaping(FirestoreCompletion)) {
+    static func addToSaved(caption: String, image: UIImage, uuid: String, completion: @escaping(FirestoreCompletion)) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
         ImageUploader.uploadImage(image: image) { imageUrl in
-            let data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid  ]
+            let data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid]
             
-            COLLECTION_SAVED_POSTS.document(uid).collection("posts").addDocument(data: data, completion: completion)
+            COLLECTION_SAVED_POSTS.document(uid).collection("posts").document(uuid).setData(data, completion: completion)
+        }
+    }
+    
+    static func checkIfSaved(postId: String, completion: @escaping(Bool) -> ()) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        COLLECTION_SAVED_POSTS.document(uid).collection("posts").document(postId).getDocument { snapshot, error in
+            if let isSaved = snapshot?.exists {
+                completion(isSaved)
+            }
         }
     }
     
@@ -78,5 +83,10 @@ struct PostService {
                 completion(posts)
             }
         }
+    }
+    
+    static func removeFromSaved(postId: String, completion: @escaping(Error?) -> ()) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        COLLECTION_SAVED_POSTS.document(uid).collection("posts").document(postId).delete()
     }
 }

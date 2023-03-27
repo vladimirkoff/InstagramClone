@@ -13,6 +13,7 @@ struct Post {
     var likes: Int
 //    var time: Date
     var caption: String
+    var postId: String
     
     init(dictionary: [String: Any]) {
         self.imageUrl = dictionary["imageUrl"] as? String ?? ""
@@ -20,6 +21,6 @@ struct Post {
         self.likes = dictionary["likes"] as? Int ?? 0
 //        self.time = dictionary["timestamp"] as? Date ?? Date()
         self.caption = dictionary["caption"] as? String ?? ""
-        
+        self.postId = dictionary["postId"] as? String ?? ""
     }
 }

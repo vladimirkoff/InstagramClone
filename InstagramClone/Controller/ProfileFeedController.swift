@@ -92,7 +92,7 @@ extension ProfileFeedController {
             cell.captionLabel.text = post.caption
             cell.usernameLabel.text = post.caption.isEmpty ? "" : viewModel?.username ?? ""
             cell.profileImage.sd_setImage(with: viewModel?.profileImageUrl)
-//            cell.upperusernameLabel. = viewModel?.username ?? ""
+            cell.usernameButton.setTitle(viewModel?.username ?? "", for: .normal)
         }
         return cell
     }
@@ -121,6 +121,32 @@ extension ProfileFeedController: UICollectionViewDelegateFlowLayout {
         var height = width + 8 + 40 + 8
         height += 110
         return CGSize(width: width, height: height)
+    }
+}
+
+extension ProfileFeedController: PostCellDelegate {
+    
+    func usernameTapped() {
+        print("Username tapped")
+    }
+    
+    func showOptions() {
+//        if true {
+//            actionSheet = ActionSheetLauncher()
+//            self.actionSheet.delegate = self
+//            actionSheet.show()
+//        }
+        print("Show options")
+    }
+    
+    func savePost(caption: String, image: UIImage, uuid: String) {
+        PostService.addToSaved(caption: caption, image: image, uuid: "sd") { error in
+            if let error = error {
+                print("Error saving post - \(error.localizedDescription)")
+                return
+            }
+            print("Success!")
+        }
     }
 }
 

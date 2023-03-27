@@ -19,12 +19,9 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     private var actionSheet: ActionSheetLauncher!
     private var posts: [Post]?
     private var viewModel: PostViewModel?
+    private var user: User?
     
     //MARK: - Lifecycle
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        fetchPosts()
-//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,12 +47,14 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     
     func fetchPosts() {
         PostService.fetchPosts { [weak self] posts in
+            print("Get post")
             self?.posts = posts
             self?.collectionView.reloadData()
         }
     }
     
     func getUserByUid(uid: String) {
+        print("GetUser")
         UserService.fetchUser(by: uid) { [weak self] user in
             self?.viewModel = PostViewModel(user: user)
         }
@@ -75,11 +74,11 @@ extension FeedController {
         if let post = posts?[indexPath.row] {
             getUserByUid(uid: post.uid)
             cell.postImage.sd_setImage(with: URL(string: post.imageUrl))
+            cell.post = self.posts![indexPath.row]
             cell.captionLabel.text = post.caption
             cell.usernameLabel.text = post.caption.isEmpty ? "" : viewModel?.username ?? ""
             cell.profileImage.sd_setImage(with: viewModel?.profileImageUrl)
-//            cell.upperusernameLabel.text = viewModel?.username ?? ""
-            cell.usernameButton.setTitle(viewModel?.username ?? "", for: .normal)
+            cell.usernameButton.setTitle(viewModel?.username ?? "ribbon", for: .normal)
         }
         return cell
     }
@@ -124,7 +123,8 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
 extension FeedController: PostCellDelegate {
     
     func usernameTapped() {
-        print("Username tapped")
+        let vc = ProfileController(user: viewModel!.user)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     func showOptions() {
@@ -135,13 +135,24 @@ extension FeedController: PostCellDelegate {
         }
     }
     
-    func test(caption: String, image: UIImage) {
-        PostService.addToSaved(caption: caption, image: image) { error in
-            if let error = error {
-                print("Error saving post - \(error.localizedDescription)")
-                return
+    func savePost(caption: String, image: UIImage, uuid: String) {
+         PostService.checkIfSaved(postId: uuid, completion: { isSaved in
+            if isSaved {
+                PostService.removeFromSaved(postId: uuid) { error in
+                    if let error = error {
+                        print("Error unsaving post - \(error.localizedDescription)")
+                        return
+                    }
+                }
+            } else {
+                PostService.addToSaved(caption: caption, image: image, uuid: uuid) { error in
+                    if let error = error {
+                        print("Error saving post - \(error.localizedDescription)")
+                        return
+                    }
+                    print("Success!")
+                }
             }
-            print("Success!")
-        }
+        })
     }
 }

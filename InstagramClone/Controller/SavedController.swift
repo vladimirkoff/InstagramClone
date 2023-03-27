@@ -105,30 +105,7 @@ extension SavedController: UICollectionViewDelegateFlowLayout {
         let width = (view.frame.width - 2) / 3
         return CGSize(width: width, height: width)
     }
-    
- 
-    
 }
 
-//MARK: - ProfileHeaderDelegate
 
-extension SavedController: ProfileHeaderDelegate {
-    
-    func header(_ profileHeader: ProfileHeader, didTapActionButton forUser: User) {
-        print("Header null")
-    }
-    
-    func profileActionTapped(action: ProfileActions) {
-        switch action {
-        case .list:
-            let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
-            navigationController?.pushViewController(vc, animated: true)
-        case .posts:
-            let vc = ProfileController(user: user)
-            navigationController?.pushViewController(vc, animated: true)
-        case .saved:
-            print("saved")
-        }
-    }
-}
 
