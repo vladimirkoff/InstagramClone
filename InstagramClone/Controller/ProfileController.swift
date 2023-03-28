@@ -117,6 +117,9 @@ extension ProfileController {
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
+        vc.navigationController?.navigationBar.barStyle = .default
+       
+
         navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -148,6 +151,8 @@ extension ProfileController: UICollectionViewDelegateFlowLayout {
 
 extension ProfileController: ProfileHeaderDelegate {
     
+    
+    
     func profileActionTapped(action: ProfileActions) {
         switch action {
         case .list:
@@ -158,7 +163,13 @@ extension ProfileController: ProfileHeaderDelegate {
             navigationController?.pushViewController(vc, animated: true)
         case .saved:
             let vc = SavedController(user: user)
-            navigationController?.pushViewController(vc, animated: true)
+//            navigationController?.pushViewController(vc, animated: true)
+            
+            
+            let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .fullScreen
+            
+                      present(nav, animated: true, completion: nil)
         }
     }
     

@@ -31,10 +31,17 @@ class SavedController: UICollectionViewController {
         fetchPosts()
     }
     
+    @objc func cancel() {
+        dismiss(animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         configureUI()
+        navigationController?.navigationBar.isHidden = false
+        navigationController?.navigationBar.backgroundColor = .white
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
     }
     
     //MARK: - API
@@ -50,6 +57,11 @@ class SavedController: UICollectionViewController {
     
     func configureUI() {
         navigationItem.title = "Saved posts"
+        navigationController?.navigationBar.backgroundColor = .red
+        view.backgroundColor = .purple
+        
+    
+        
         collectionView.backgroundColor = .white
         collectionView.register(ProfileCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         
@@ -83,6 +95,7 @@ extension SavedController {
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
         vc.indexPath = indexPath.row
+    
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -92,6 +105,7 @@ extension SavedController {
 //MARK: - UICollectionViewDelegateFlowLayout
 
 extension SavedController: UICollectionViewDelegateFlowLayout {
+    
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 1

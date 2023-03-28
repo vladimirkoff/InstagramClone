@@ -15,6 +15,8 @@ struct PostViewModel {
         return URL(string: user.profileImageUrl)
     }
     
+    var isSaved = false
+    
     var username: String? {
         return user.username
     }

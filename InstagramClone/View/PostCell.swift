@@ -9,8 +9,9 @@ import UIKit
 
 protocol PostCellDelegate: class {
     func showOptions()
-    func savePost(caption: String, image: UIImage, uuid: String)  // saving post
+    func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ())  // saving post
     func usernameTapped()
+    func likeTapped()
 }
 
 class PostCell: UICollectionViewCell {
@@ -115,7 +116,7 @@ class PostCell: UICollectionViewCell {
         return button
     }()
     
-    private lazy var saveButton: UIButton = {
+    lazy var saveButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "ribbon"), for: .normal)
@@ -129,6 +130,7 @@ class PostCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .white
+      
         
         addSubview(profileImage)
         profileImage.topAnchor.constraint(equalTo: self.topAnchor, constant: 12).isActive = true
@@ -203,12 +205,17 @@ class PostCell: UICollectionViewCell {
     }
     
     @objc func didTapLike() {
-        
+        delegate?.likeTapped()
     }
     
     @objc func saveTapped() {
-        delegate?.savePost(caption: self.captionLabel.text!, image: self.postImage.image!, uuid: post!.postId )
-        saveButton.setImage(UIImage(named: "ribbon_filled"), for: .normal)
+        print("Save tapped")
+        delegate?.savePost(caption: self.captionLabel.text!, image: self.postImage.image!, uuid: post!.postId, completion: { saved in
+            print("Completion")
+            print(saved)
+            let image = saved ? "ribbon" : "ribbon_filled"
+            self.saveButton.setImage(UIImage(named: image), for: .normal)
+        })
     }
     
     @objc func commentTapped() {
@@ -222,5 +229,6 @@ class PostCell: UICollectionViewCell {
     //MARK: - Helpers
     
    
-    
 }
+
+

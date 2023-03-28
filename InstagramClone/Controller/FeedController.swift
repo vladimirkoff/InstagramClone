@@ -16,28 +16,39 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
         print("Tapped")
     }
     
+    
     private var actionSheet: ActionSheetLauncher!
-    private var posts: [Post]?
+    
+    private var posts: [Post]? {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
+    
     private var viewModel: PostViewModel?
-    private var user: User?
     
     //MARK: - Lifecycle
     
+    override func viewWillAppear(_ animated: Bool) {
+        fetchPosts()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchPosts()
-        configureUI()
-        collectionView.reloadData()
         
+            fetchPosts()
+        configureUI()
     }
     
     //MARK: - Helpers
     
     func configureUI() {
+        fetchPosts()
         collectionView.register(PostCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Log out", style: .plain, target: self, action: #selector(logOut))
-        navigationController?.navigationBar.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 20)
         navigationItem.title = "Instagram"
+        
+     
         
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
@@ -47,19 +58,23 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     
     func fetchPosts() {
         PostService.fetchPosts { [weak self] posts in
-            print("Get post")
             self?.posts = posts
-            self?.collectionView.reloadData()
+            
         }
     }
     
-    func getUserByUid(uid: String) {
-        print("GetUser")
-        UserService.fetchUser(by: uid) { [weak self] user in
-            self?.viewModel = PostViewModel(user: user)
+    func configureViewModel(uid: String, postId: String) {
+        PostService.checkIfSaved(postId: postId) { [weak self] isSaved in
+            UserService.fetchUser(by: uid) { user in
+                self?.viewModel = PostViewModel(user: user)
+                self?.viewModel?.isSaved = isSaved
+            }
         }
+        
     }
 }
+
+
 
 //MARK: - UICollectionViewDataSource
 extension FeedController {
@@ -71,15 +86,20 @@ extension FeedController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PostCell
         cell.delegate = self
-        if let post = posts?[indexPath.row] {
-            getUserByUid(uid: post.uid)
-            cell.postImage.sd_setImage(with: URL(string: post.imageUrl))
-            cell.post = self.posts![indexPath.row]
-            cell.captionLabel.text = post.caption
-            cell.usernameLabel.text = post.caption.isEmpty ? "" : viewModel?.username ?? ""
-            cell.profileImage.sd_setImage(with: viewModel?.profileImageUrl)
-            cell.usernameButton.setTitle(viewModel?.username ?? "ribbon", for: .normal)
+        if let posts = posts {
+            configureViewModel(uid: posts[indexPath.row].uid, postId: posts[indexPath.row].postId)
+            if let viewModel = viewModel {
+                cell.postImage.sd_setImage(with: URL(string: posts[indexPath.row].imageUrl))
+                cell.post = posts[indexPath.row]
+                cell.captionLabel.text = posts[indexPath.row].caption
+                cell.usernameLabel.text = posts[indexPath.row].caption.isEmpty ? "" : posts[indexPath.row].username
+                cell.profileImage.sd_setImage(with: URL(string: posts[indexPath.row].profileImage) )
+                cell.usernameButton.setTitle(posts[indexPath.row].username, for: .normal)
+//                let image = viewModel.isSaved ? UIImage(named: "ribbon_filled") : UIImage(named: "ribbon")
+//                cell.saveButton.setImage(image, for: .normal)
+            }
         }
+        
         return cell
     }
     
@@ -92,7 +112,6 @@ extension FeedController {
     @objc func logOut() {
         do {
             try Auth.auth().signOut()
-            
             let controller = LoginController()
             let nav = UINavigationController(rootViewController: controller)
             nav.modalPresentationStyle = .fullScreen
@@ -106,7 +125,6 @@ extension FeedController {
         fetchPosts()
         self.collectionView.refreshControl?.endRefreshing()
     }
-    
 }
 
 //MARK: - UICollectionViewDelegateFlowLayout
@@ -122,9 +140,15 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
 
 extension FeedController: PostCellDelegate {
     
+    func likeTapped() {
+        print("Liked")
+    }
+    
+    
     func usernameTapped() {
-        let vc = ProfileController(user: viewModel!.user)
-        navigationController?.pushViewController(vc, animated: true)
+//        let vc = ProfileController(user: viewModel!.user)
+//        navigationController?.pushViewController(vc, animated: true)
+        print("Go to profile")
     }
     
     func showOptions() {
@@ -135,23 +159,30 @@ extension FeedController: PostCellDelegate {
         }
     }
     
-    func savePost(caption: String, image: UIImage, uuid: String) {
-         PostService.checkIfSaved(postId: uuid, completion: { isSaved in
+    func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ()) {
+        var saved = false
+        PostService.checkIfSaved(postId: uuid, completion: { isSaved in
+            print(isSaved)
             if isSaved {
+                saved = true
                 PostService.removeFromSaved(postId: uuid) { error in
                     if let error = error {
                         print("Error unsaving post - \(error.localizedDescription)")
                         return
                     }
+                    completion(saved)
                 }
+                return
             } else {
+                saved = false
                 PostService.addToSaved(caption: caption, image: image, uuid: uuid) { error in
                     if let error = error {
                         print("Error saving post - \(error.localizedDescription)")
                         return
                     }
-                    print("Success!")
+                    completion(saved)
                 }
+                
             }
         })
     }

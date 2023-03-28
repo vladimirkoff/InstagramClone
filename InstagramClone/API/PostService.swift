@@ -12,15 +12,16 @@ import FirebaseFirestore
 struct PostService {
     static func uploadPost(caption: String, image: UIImage, completion: @escaping(FirestoreCompletion)) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
-        
-        ImageUploader.uploadImage(image: image) { imageUrl in
-            let uuid = UUID().uuidString
-            var data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid, "postId": uuid]
-            COLLECTION_POSTS.document(uuid).setData(data, completion: completion)
-            
+        UserService.fetchUser(by: uid) { user in
             ImageUploader.uploadImage(image: image) { imageUrl in
-                let data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid, "postId": uuid]
-                COLLECTION_USER_POSTS.document(uid).collection("posts").document(uuid).setData(data, completion: completion)
+                let uuid = UUID().uuidString
+                let data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid, "postId": uuid, "username": user.username, "profileImage" : user.profileImageUrl]
+                COLLECTION_POSTS.document(uuid).setData(data, completion: completion)
+                
+                ImageUploader.uploadImage(image: image) { imageUrl in
+                    let data: [String : Any] = ["caption" : caption, "timestamp" : Timestamp(date: Date()), "likes" : 0, "imageUrl" : imageUrl, "ownerUid" : uid, "postId": uuid, "username": user.username,  "profileImage" : user.profileImageUrl]
+                    COLLECTION_USER_POSTS.document(uid).collection("posts").document(uuid).setData(data, completion: completion)
+                }
             }
         }
     }
@@ -65,6 +66,7 @@ struct PostService {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         COLLECTION_SAVED_POSTS.document(uid).collection("posts").document(postId).getDocument { snapshot, error in
             if let isSaved = snapshot?.exists {
+                print("\(postId) for \(uid) is saved - \(isSaved)")
                 completion(isSaved)
             }
         }
@@ -87,6 +89,43 @@ struct PostService {
     
     static func removeFromSaved(postId: String, completion: @escaping(Error?) -> ()) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
-        COLLECTION_SAVED_POSTS.document(uid).collection("posts").document(postId).delete()
+        COLLECTION_SAVED_POSTS.document(uid).collection("posts").document(postId).delete(completion: completion)
     }
+    
+    static func likePost(postId: String, ownerId: String, completion: @escaping(Bool) -> ()) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        COLLECTION_POSTS.document(postId).getDocument { snapshot, error in
+            guard var likes = snapshot?.data()?["likes"] as? Int else { return }
+            likes += 1
+            COLLECTION_POSTS.document(postId).updateData(["likes" : likes])
+            COLLECTION_USER_POSTS.document(ownerId).collection("posts").document(postId).updateData(["likes" : likes])
+          
+            
+       
+            COLLECTION_USER_POSTS.document(uid).collection("posts").document(postId).getDocument { snapshot, error in
+                guard let isLiked = snapshot?.exists else { return }
+                
+            }
+        }
+        
+        
+        
+    }
+    
+    static func unlikePost(postId: String) {
+        COLLECTION_POSTS.document(postId).getDocument { snapshot, err in
+            guard let snapshot = snapshot?.data() else { return }
+            
+            var likes = snapshot["likes"] as! Int
+            likes -= 1
+            COLLECTION_POSTS.document(postId).updateData(["likes" : likes])
+            print(likes)
+        }
+    }
+    
+    static func updateUserPosts(uid: String, postId: String, likes: Int) {
+        COLLECTION_USER_POSTS.document(uid).collection("posts").document(postId).updateData(["likes" : likes])
+    }
+    
 }

@@ -15,4 +15,4 @@ let COLLECTION_FOLLOWING = Firestore.firestore().collection("following")
 let COLLECTION_POSTS = Firestore.firestore().collection("posts")
 let COLLECTION_USER_POSTS = Firestore.firestore().collection("user-posts")
 let COLLECTION_SAVED_POSTS = Firestore.firestore().collection("saved-posts")
-
+let COLLECTON_USERS_LIKES = Firestore.firestore().collection("users-likes")

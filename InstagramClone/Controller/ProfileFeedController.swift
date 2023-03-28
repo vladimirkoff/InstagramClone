@@ -37,8 +37,11 @@ class ProfileFeedController: UICollectionViewController {
         super.viewDidLoad()
         configureUI()
         collectionView.reloadData()
-   
-    }
+        navigationController?.navigationBar.barStyle = .default
+        navigationController?.navigationBar.backgroundColor = .purple
+        collectionView.backgroundColor = .red
+        navigationController?.navigationBar.frame
+        }
     
     //MARK: - Helpers
     
@@ -126,6 +129,11 @@ extension ProfileFeedController: UICollectionViewDelegateFlowLayout {
 
 extension ProfileFeedController: PostCellDelegate {
     
+    func likeTapped() {
+        
+    }
+    
+    
     func usernameTapped() {
         print("Username tapped")
     }
@@ -139,14 +147,34 @@ extension ProfileFeedController: PostCellDelegate {
         print("Show options")
     }
     
-    func savePost(caption: String, image: UIImage, uuid: String) {
-        PostService.addToSaved(caption: caption, image: image, uuid: "sd") { error in
-            if let error = error {
-                print("Error saving post - \(error.localizedDescription)")
+    func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ()) {
+         var saved = false
+         PostService.checkIfSaved(postId: uuid, completion: { isSaved in
+            if isSaved {
+                saved = true
+                PostService.removeFromSaved(postId: uuid) { error in
+                    if let error = error {
+                        print("Error unsaving post - \(error.localizedDescription)")
+                        return
+                    }
+                    completion(saved)
+                    self.collectionView.reloadData()
+                }
                 return
+            } else {
+                saved = false
+                PostService.addToSaved(caption: caption, image: image, uuid: uuid) { error in
+                    if let error = error {
+                        print("Error saving post - \(error.localizedDescription)")
+                        return
+                    }
+                    completion(saved)
+                    self.collectionView.reloadData()
+                    print("Success!")
+                }
+                
             }
-            print("Success!")
-        }
+        })
     }
 }
 

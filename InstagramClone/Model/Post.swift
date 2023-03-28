@@ -14,6 +14,9 @@ struct Post {
 //    var time: Date
     var caption: String
     var postId: String
+    var username: String
+    var profileImage: String
+    var isSaved = false
     
     init(dictionary: [String: Any]) {
         self.imageUrl = dictionary["imageUrl"] as? String ?? ""
@@ -22,5 +25,7 @@ struct Post {
 //        self.time = dictionary["timestamp"] as? Date ?? Date()
         self.caption = dictionary["caption"] as? String ?? ""
         self.postId = dictionary["postId"] as? String ?? ""
+        self.username = dictionary["username"] as? String ?? ""
+        self.profileImage = dictionary["profileImage"] as? String ?? ""
     }
 }
