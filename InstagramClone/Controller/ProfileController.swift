@@ -31,6 +31,7 @@ class ProfileController: UICollectionViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         configureUI()
         fetchPosts(uid: user.uid)
         
@@ -117,6 +118,7 @@ extension ProfileController {
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
+        vc.profile = true
         vc.navigationController?.navigationBar.barStyle = .default
        
 
@@ -169,14 +171,13 @@ extension ProfileController: ProfileHeaderDelegate {
             let nav = UINavigationController(rootViewController: vc)
             nav.modalPresentationStyle = .fullScreen
             
-                      present(nav, animated: true, completion: nil)
+            present(nav, animated: true, completion: nil)
         }
     }
     
     func header(_ profileHeader: ProfileHeader, didTapActionButton forUser: User) {
         if user.isCurrentUser {
             let vc = EditProfileController()
-            
             navigationController?.pushViewController(vc, animated: true)
         } else if user.isFollowed {
             UserService.unfollow(uid: user.uid) { [weak self] error in

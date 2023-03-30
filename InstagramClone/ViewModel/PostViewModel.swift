@@ -9,24 +9,26 @@ import Foundation
 
 struct PostViewModel {
     
-    let user: User
+    var post: Post
     
     var profileImageUrl: URL? {
-        return URL(string: user.profileImageUrl)
+        return URL(string: post.profileImage) 
     }
     
-    var isSaved = false
+    var caption: String? {
+        return post.caption
+    }
+    
+    var likes: String {
+        return  post.likes == 1 ? "\(post.likes) like"  : "\(post.likes) likes"
+    }
     
     var username: String? {
-        return user.username
+        return post.username
     }
     
-    var upperUsername: String? {
-        return user.username
-    }
-
-    init(user: User) {
-        self.user = user
+    init(post: Post) {
+        self.post = post
     }
     
 }

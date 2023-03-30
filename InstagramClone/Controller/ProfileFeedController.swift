@@ -14,34 +14,34 @@ private let reuseIdentifier = "ProfilePostCell"
 
 class ProfileFeedController: UICollectionViewController {
     
-    var indexPath: Int?
+
     private var posts: [Post]?
     private var viewModel: PostViewModel?
     
+    var profile: Bool?
+    
     //MARK: - Lifecycle
     
-    
-    
+
     override func viewWillAppear(_ animated: Bool) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
-        if let indexPath = indexPath {
-            print("here")
-            fetchSavedPosts()
-        } else {
-            fetchPosts(uid: uid)
+        if let profile = profile {
+            if profile {
+                fetchPosts(uid: uid)
+            } else {
+                fetchSavedPosts()
+            }
         }
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         collectionView.reloadData()
-        navigationController?.navigationBar.barStyle = .default
-        navigationController?.navigationBar.backgroundColor = .purple
-        collectionView.backgroundColor = .red
-        navigationController?.navigationBar.frame
-        }
+        
+    }
     
     //MARK: - Helpers
     
@@ -70,11 +70,12 @@ class ProfileFeedController: UICollectionViewController {
         }
     }
     
-    func getUserByUid(uid: String) {
-        UserService.fetchUser(by: uid) { [weak self] user in
-            self?.viewModel = PostViewModel(user: user)
+    func fetchUser(uid: String, completion: @escaping(User) -> ()) {
+        UserService.fetchUser(by: uid) { user in
+            completion(user)
         }
     }
+    
 }
 
 //MARK: - UICollectionViewDataSource
@@ -85,27 +86,14 @@ extension ProfileFeedController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PostCell
-        
-        if let post = posts?[indexPath.row] {
-            guard let uid = Auth.auth().currentUser?.uid else { return UICollectionViewCell() }
-            getUserByUid(uid: uid)
-            cell.postImage.sd_setImage(with: URL(string: post.imageUrl))
-            cell.captionLabel.text = post.caption
-            cell.usernameLabel.text = post.caption.isEmpty ? "" : viewModel?.username ?? ""
-            cell.profileImage.sd_setImage(with: viewModel?.profileImageUrl)
-            cell.usernameButton.setTitle(viewModel?.username ?? "", for: .normal)
+        cell.delegate = self
+        if let posts = self.posts {
+            cell.viewModel = PostViewModel(post: posts[indexPath.row])
         }
         return cell
     }
-    
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("SELECTED")
-    }
-    
-    
-    
+   
     //MARK: - Selectors
     
     @objc func handleRefresh() {
@@ -128,14 +116,31 @@ extension ProfileFeedController: UICollectionViewDelegateFlowLayout {
 }
 
 extension ProfileFeedController: PostCellDelegate {
-    
-    func likeTapped() {
+    func commentTapped() {
         
     }
     
+    func likeTapped(post: Post, cell: PostCell) {
+        guard let postId = cell.viewModel?.post.postId else { return }
+        PostService.checkIfLiked(postId: postId) { isLiked in
+            if isLiked {
+                PostService.unlikePost(postId: postId) { error in
+                    print("Completed unliking")
+                }
+            } else {
+                PostService.likePost(postId: postId ) { err in
+                    print("Completed liking")
+                }
+            }
+        }
+    }
     
-    func usernameTapped() {
-        print("Username tapped")
+    func usernameTapped(cell: PostCell) {
+        guard let uid = cell.viewModel?.post.uid else { return }
+        fetchUser(uid: uid ) { [weak self] user in
+            let vc = ProfileController(user: user)
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     func showOptions() {
@@ -148,33 +153,18 @@ extension ProfileFeedController: PostCellDelegate {
     }
     
     func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ()) {
-         var saved = false
-         PostService.checkIfSaved(postId: uuid, completion: { isSaved in
+        PostService.checkIfSaved(postId: uuid) { isSaved in
+            completion(isSaved)
             if isSaved {
-                saved = true
                 PostService.removeFromSaved(postId: uuid) { error in
-                    if let error = error {
-                        print("Error unsaving post - \(error.localizedDescription)")
-                        return
-                    }
-                    completion(saved)
-                    self.collectionView.reloadData()
+                    print("Unsaved")
                 }
-                return
             } else {
-                saved = false
                 PostService.addToSaved(caption: caption, image: image, uuid: uuid) { error in
-                    if let error = error {
-                        print("Error saving post - \(error.localizedDescription)")
-                        return
-                    }
-                    completion(saved)
-                    self.collectionView.reloadData()
-                    print("Success!")
+                    print("Saved")
                 }
-                
             }
-        })
+        }
     }
 }
 

@@ -28,6 +28,7 @@ class SavedController: UICollectionViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         fetchPosts()
     }
     
@@ -94,8 +95,7 @@ extension SavedController {
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
-        vc.indexPath = indexPath.row
-    
+        vc.profile = false
         navigationController?.pushViewController(vc, animated: true)
     }
     

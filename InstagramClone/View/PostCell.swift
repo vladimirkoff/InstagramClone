@@ -6,20 +6,30 @@
 //
 
 import UIKit
+import SDWebImage
 
 protocol PostCellDelegate: class {
     func showOptions()
     func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ())  // saving post
-    func usernameTapped()
-    func likeTapped()
+    func usernameTapped(cell: PostCell)
+    func likeTapped(post: Post, cell: PostCell)
+    func commentTapped()
 }
 
 class PostCell: UICollectionViewCell {
     
     //MARK: - Properties
     
+    var viewModel: PostViewModel? {
+        didSet {
+            configure()
+        }
+    }
+    
+    
+    
     weak var delegate: PostCellDelegate?
-    var post: Post?
+    
     
     var profileImage: UIImageView = {
         let iv = UIImageView()
@@ -65,6 +75,7 @@ class PostCell: UICollectionViewCell {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "comment"), for: .normal)
         button.tintColor = .black
+        button.addTarget(self, action: #selector(commentTapped), for: .touchUpInside)
         return button
     }()
     
@@ -201,32 +212,45 @@ class PostCell: UICollectionViewCell {
     //MARK: - Selectors
     
     @objc func didTapUsername() {
-        delegate?.usernameTapped()
+        delegate?.usernameTapped(cell: self)
+    }
+    
+    @objc func commentTapped() {
+        delegate?.commentTapped()
     }
     
     @objc func didTapLike() {
-        delegate?.likeTapped()
+        guard let post = viewModel?.post else { return }
+        delegate?.likeTapped(post: post, cell: self)
     }
     
     @objc func saveTapped() {
-        print("Save tapped")
-        delegate?.savePost(caption: self.captionLabel.text!, image: self.postImage.image!, uuid: post!.postId, completion: { saved in
-            print("Completion")
-            print(saved)
-            let image = saved ? "ribbon" : "ribbon_filled"
+        delegate?.savePost(caption: self.captionLabel.text!, image: self.postImage.image!, uuid: viewModel!.post.postId, completion: { isSaved in
+            print(isSaved)
+            let image = isSaved ? "ribbon" : "ribbon_filled"
             self.saveButton.setImage(UIImage(named: image), for: .normal)
         })
     }
     
-    @objc func commentTapped() {
-       
-    }
     
     @objc func optionsButtonPressed() {
         delegate?.showOptions()
     }
     
     //MARK: - Helpers
+    
+    func configure() {
+        guard let viewModel = viewModel else { return }
+        captionLabel.text = viewModel.caption
+        profileImage.sd_setImage(with: URL(string: viewModel.post.profileImage))
+        postImage.sd_setImage(with: URL(string: viewModel.post.imageUrl))
+        usernameLabel.text = viewModel.username
+        usernameButton.setTitle(viewModel.username, for: .normal)
+        likesLabel.text = viewModel.likes
+        
+        let image = viewModel.post.isLiked ? "ribbon" : "play"
+        likeButton.setImage(UIImage(named: image), for: .normal)
+    }
     
    
 }

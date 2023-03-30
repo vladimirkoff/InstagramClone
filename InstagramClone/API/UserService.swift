@@ -90,7 +90,7 @@ struct UserService {  // fetching user information
         }
     }
     static func getNumberOfPosts(with uid: String, completion: @escaping(Int) -> ()) {
-        COLLECTION_USER_POSTS.document(uid).collection("posts").getDocuments { snapshot, error in
+        COLLECTION_USERS.document(uid).collection("user-posts").getDocuments { snapshot, error in
             guard let snapshot = snapshot else { return }
             completion(snapshot.count)
         }

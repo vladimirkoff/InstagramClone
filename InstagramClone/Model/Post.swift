@@ -17,6 +17,7 @@ struct Post {
     var username: String
     var profileImage: String
     var isSaved = false
+    var isLiked = false
     
     init(dictionary: [String: Any]) {
         self.imageUrl = dictionary["imageUrl"] as? String ?? ""

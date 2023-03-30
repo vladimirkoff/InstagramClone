@@ -22,10 +22,14 @@ class MainTabController: UITabBarController {
     //MARK: - Lifecycle
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         self.selectedIndex = 0
     }
     
     override func viewDidLoad() {
+        
+       
+        
         super.viewDidLoad()
         view.backgroundColor = .white
         checkIfLoggedIn()
@@ -43,7 +47,6 @@ class MainTabController: UITabBarController {
                 nav.modalPresentationStyle = .fullScreen
                 self.present(nav, animated: true, completion: nil)
             }
-            
         }
     }
     
