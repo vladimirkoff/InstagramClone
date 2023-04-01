@@ -17,7 +17,7 @@ class CommentTextView: UIView {
     
     weak var delegate: CommentTextViewDelegate?
         
-    private let commentTextView: InputTextView = {
+     var commentTextView: InputTextView = {
         let tv = InputTextView()
         tv.placeholderLabel.text = "Enter comment"
         tv.translatesAutoresizingMaskIntoConstraints = false

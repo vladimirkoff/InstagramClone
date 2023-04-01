@@ -17,6 +17,7 @@ class CommentController: UICollectionViewController {
    lazy private var commentInputView: CommentTextView = {
         let frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         let cv = CommentTextView(frame: frame )
+       
         cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()
@@ -36,7 +37,7 @@ class CommentController: UICollectionViewController {
             }
         }
 
-    
+    var dismiss: Bool?
     
     override var inputAccessoryView: UIView? {
         get {
@@ -44,9 +45,11 @@ class CommentController: UICollectionViewController {
         }
     }
     
-//    override var canBecomeFirstResponder: Bool {
-//        return true
-//    }
+    override var canBecomeFirstResponder: Bool {
+        return dismiss ?? false
+    }
+    
+   
     
     func fetchUser() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
@@ -142,15 +145,23 @@ extension CommentController {
 
 extension CommentController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+      
+        
+        let viewModel = CommentViewModel(comment: comments![indexPath.row])
         let width: CGFloat = view.frame.width
-        let height: CGFloat = 40
+        let height: CGFloat = viewModel.size(width: width).height + 32
+        
         return CGSize(width: width, height: height)
     }
 }
 
 extension CommentController: CommentTextViewDelegate {
     func postComment(text: String) {
+        view.endEditing(true)
         guard let user = user else { return }
+        commentInputView.commentTextView.text = ""
+        commentInputView.commentTextView.resignFirstResponder()
+        
         
         let comment = Comment(text: text, uid: user.uid, username: user.username, profileUrl: user.profileImageUrl, timeStamp: Date())
         PostService.uploadComment(post: post!, comment: comment) { error in
@@ -159,14 +170,25 @@ extension CommentController: CommentTextViewDelegate {
     }
 }
 
+//extension CommentController: UITextViewDelegate {
+//    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+//        if(text == "\n") {
+//            textView.resignFirstResponder()
+//            return false
+//        }
+//        return true
+//    }
+//}
+
 extension CommentController: CommentCellDelegate {
     func goToProfile(uid: String) {
         UserService.fetchUser(by: uid) { user in
-            print("Here")
             let vc = ProfileController(user: user)
             vc.tabBarController?.tabBar.isHidden = false
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
 }
+
+
 

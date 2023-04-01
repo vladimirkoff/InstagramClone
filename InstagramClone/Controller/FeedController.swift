@@ -16,15 +16,22 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
         print("Tapped")
     }
     
-    private var isLiked: Bool?
-
     private var actionSheet: ActionSheetLauncher!
-    
+        
     private var posts: [Post]? {
         didSet {
-            
             collectionView.reloadData()
         }
+    }
+    
+    func checkIfSaved() {
+        self.posts?.forEach({ post in
+            PostService.checkIfSaved(postId: post.postId) { isSaved in
+                if let index = self.posts?.firstIndex(where: {$0.postId == post.postId}) {
+                    self.posts![index].isSaved = isSaved
+                }
+            }
+        })
     }
     
     //MARK: - Lifecycle
@@ -57,14 +64,20 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     func fetchPosts() {
         PostService.fetchPosts { [weak self] posts in
             self?.posts = posts
+            self?.checkIfLiked()
+            self?.checkIfSaved()
         }
     }
     
-    func checkIfLiked(postId: String) {
-       guard let uid = Auth.auth().currentUser?.uid else { return }
-        PostService.checkIfLiked(postId: postId) { isLiked in
-            self.isLiked = isLiked
+    func checkIfLiked() {
+        self.posts!.forEach { post in
+            PostService.checkIfLiked(postId: post.postId) { isLiked in
+                if let index = self.posts?.firstIndex(where: {$0.postId == post.postId}) {
+                    self.posts![index].isLiked = isLiked
+                }
+            }
         }
+        
     }
     
     func fetchUser(uid: String, completion: @escaping(User) -> ()) {
@@ -124,6 +137,12 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
 }
 
 extension FeedController: PostCellDelegate {
+    func shareTapped(post: Post) {
+          let text = "Share this post"
+          
+          
+      }
+    
     
     func commentTapped(post: Post) {
         let vc = CommentController(post: post)
@@ -131,14 +150,15 @@ extension FeedController: PostCellDelegate {
     }
     
     func likeTapped(post: Post, cell: PostCell) {
-        guard let postId = cell.viewModel?.post.postId else { return }
-        PostService.checkIfLiked(postId: postId) { isLiked in
+        PostService.checkIfLiked(postId: post.postId) { isLiked in
             if isLiked {
-                PostService.unlikePost(postId: postId) { error in
+                cell.likeButton.setImage(UIImage(named: "like_unselected"), for: .normal)
+                PostService.unlikePost(postId: post.postId) { error in
                     print("Completed unliking")
                 }
             } else {
-                PostService.likePost(postId: postId ) { err in
+                cell.likeButton.setImage(UIImage(named: "like_selected"), for: .normal)
+                PostService.likePost(postId: post.postId ) { err in
                     print("Completed liking")
                 }
             }

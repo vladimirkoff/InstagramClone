@@ -116,6 +116,10 @@ extension ProfileFeedController: UICollectionViewDelegateFlowLayout {
 }
 
 extension ProfileFeedController: PostCellDelegate {
+    func shareTapped(post: Post) {
+        
+    }
+    
     func commentTapped(post: Post) {
         
     }

@@ -63,6 +63,7 @@ class MainTabController: UITabBarController {
         let post = templateNavController(unselectedImage: UIImage(named: "plus_unselected")!, selectedImage: UIImage(named: "plus_unselected")!, rootVC: PostController())
         let profile = ProfileController(user: user)
         let profileController = templateNavController(unselectedImage: UIImage(named: "profile_unselected")!, selectedImage: UIImage(named: "profile_selected")!, rootVC: profile  )
+        
         let notifications = templateNavController(unselectedImage: UIImage(named: "like_unselected")!, selectedImage: UIImage(named: "like_selected")!, rootVC: NotificationsController())
         
         viewControllers = [ feed, search, post, notifications, profileController ]

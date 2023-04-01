@@ -78,6 +78,8 @@ class CommentCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        commentLabel.numberOfLines = 0
+        
         addSubview(profileImage)
         profileImage.widthAnchor.constraint(equalToConstant: 40).isActive = true
         profileImage.heightAnchor.constraint(equalToConstant: 40).isActive = true
@@ -88,15 +90,16 @@ class CommentCell: UICollectionViewCell {
         
         addSubview(username)
         username.leftAnchor.constraint(equalTo: profileImage.rightAnchor, constant: 8).isActive = true
-        username.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor).isActive = true
+        username.topAnchor.constraint(equalTo: profileImage.topAnchor).isActive = true
         
         addSubview(commentLabel)
-        commentLabel.leftAnchor.constraint(equalTo: username.rightAnchor, constant: 8).isActive = true
-        commentLabel.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor).isActive = true
+        commentLabel.topAnchor.constraint(equalTo: username.bottomAnchor, constant: 4).isActive = true
+        commentLabel.leftAnchor.constraint(equalTo: profileImage.rightAnchor, constant: 8).isActive = true
+        commentLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8).isActive = true
         
         addSubview(timeStampLabel)
-        timeStampLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8).isActive = true
-        timeStampLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        timeStampLabel.leftAnchor.constraint(equalTo: username.rightAnchor, constant: 2).isActive = true
+        timeStampLabel.topAnchor.constraint(equalTo: profileImage.topAnchor).isActive = true
     }
     
     required init?(coder: NSCoder) {

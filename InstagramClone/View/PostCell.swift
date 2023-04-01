@@ -14,6 +14,7 @@ protocol PostCellDelegate: class {
     func usernameTapped(cell: PostCell)
     func likeTapped(post: Post, cell: PostCell)
     func commentTapped(post: Post)
+    func shareTapped(post: Post)
 }
 
 class PostCell: UICollectionViewCell {
@@ -61,7 +62,7 @@ class PostCell: UICollectionViewCell {
         return iv
     }()
     
-    private lazy var likeButton: UIButton = {
+    lazy var likeButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "like_unselected"), for: .normal)
@@ -84,6 +85,7 @@ class PostCell: UICollectionViewCell {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "send2"), for: .normal)
         button.tintColor = .black
+        button.addTarget(self, action: #selector(shareTapped), for: .touchUpInside)
         return button
     }()
     
@@ -211,6 +213,11 @@ class PostCell: UICollectionViewCell {
     
     //MARK: - Selectors
     
+    @objc func shareTapped() {
+        guard let viewModel = viewModel else { return }
+        delegate?.shareTapped(post: viewModel.post)
+    }
+    
     @objc func didTapUsername() {
         delegate?.usernameTapped(cell: self)
     }
@@ -249,8 +256,11 @@ class PostCell: UICollectionViewCell {
         usernameButton.setTitle(viewModel.username, for: .normal)
         likesLabel.text = viewModel.likes
         
-        let image = viewModel.post.isLiked ? "ribbon" : "play"
-        likeButton.setImage(UIImage(named: image), for: .normal)
+        let likeImage = viewModel.post.isLiked ? "like_selected" : "like_unselected"
+        likeButton.setImage(UIImage(named: likeImage), for: .normal)
+        
+        let saveImage = viewModel.post.isSaved ? "ribbon_filled" : "ribbon"
+        saveButton.setImage(UIImage(named: saveImage), for: .normal)
     }
     
    
