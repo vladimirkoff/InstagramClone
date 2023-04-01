@@ -165,20 +165,16 @@ extension CommentController: CommentTextViewDelegate {
         
         let comment = Comment(text: text, uid: user.uid, username: user.username, profileUrl: user.profileImageUrl, timeStamp: Date())
         PostService.uploadComment(post: post!, comment: comment) { error in
-            self.fetchComments()
+            guard let uid = self.post?.uid else { return }
+            UserService.fetchUser(by: uid) { postUser in
+                NotificationService.commentedPost(user: postUser, ownUser: self.user!, post: self.post!, comment: comment) { error in
+                    print("Success")
+                    self.fetchComments()
+                }
+            }
         }
     }
 }
-
-//extension CommentController: UITextViewDelegate {
-//    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-//        if(text == "\n") {
-//            textView.resignFirstResponder()
-//            return false
-//        }
-//        return true
-//    }
-//}
 
 extension CommentController: CommentCellDelegate {
     func goToProfile(uid: String) {

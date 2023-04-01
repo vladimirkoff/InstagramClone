@@ -7,14 +7,13 @@
 
 import UIKit
 
-fileprivate let reuseIdentifier = "ProfileCell"
-fileprivate let headerIdentifier = "ProfileHeader"
-
-
+private let reuseIdentifier = "ProfileCell"
+private let headerIdentifier = "ProfileHeader"
 
 class ProfileController: UICollectionViewController {
     //MARK: - Properties
     
+    var ownUser: User?
     private var user: User
     private var posts: [Post]?
     private var viewModel: PostViewModel?
@@ -154,7 +153,6 @@ extension ProfileController: UICollectionViewDelegateFlowLayout {
 extension ProfileController: ProfileHeaderDelegate {
     
     
-    
     func profileActionTapped(action: ProfileActions) {
         switch action {
         case .list:
@@ -165,9 +163,7 @@ extension ProfileController: ProfileHeaderDelegate {
             navigationController?.pushViewController(vc, animated: true)
         case .saved:
             let vc = SavedController(user: user)
-//            navigationController?.pushViewController(vc, animated: true)
-            
-            
+                        
             let nav = UINavigationController(rootViewController: vc)
             nav.modalPresentationStyle = .fullScreen
             
@@ -190,12 +186,19 @@ extension ProfileController: ProfileHeaderDelegate {
             }
         } else {
             UserService.follow(uid: user.uid) { [weak self] error  in
+                guard let self = self else{ return }
                 if let error = error {
                     print("Error following user - \(error.localizedDescription)")
                 }
-                self?.user.isFollowed = true
-                self?.user.numberOfFollowers += 1
-                self?.collectionView.reloadData()
+                
+                // the notification
+                NotificationService.userFollowed(user: self.user, ownUser: self.ownUser!) { error in
+                    print("Success")
+                }
+                
+                self.user.isFollowed = true
+                self.user.numberOfFollowers += 1
+                self.collectionView.reloadData()
             }
         }
     }

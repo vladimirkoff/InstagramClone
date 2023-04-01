@@ -16,6 +16,8 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
         print("Tapped")
     }
     
+    private var user: User?
+    
     private var actionSheet: ActionSheetLauncher!
         
     private var posts: [Post]? {
@@ -38,11 +40,13 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         fetchPosts()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        fetchCurrentUser()
         fetchPosts()
         configureUI()
     }
@@ -78,6 +82,13 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
             }
         }
         
+    }
+    
+    func fetchCurrentUser() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        UserService.fetchUser(by: uid) { user in
+            self.user = user
+        }
     }
     
     func fetchUser(uid: String, completion: @escaping(User) -> ()) {
@@ -139,8 +150,6 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
 extension FeedController: PostCellDelegate {
     func shareTapped(post: Post) {
           let text = "Share this post"
-          
-          
       }
     
     
@@ -158,18 +167,28 @@ extension FeedController: PostCellDelegate {
                 }
             } else {
                 cell.likeButton.setImage(UIImage(named: "like_selected"), for: .normal)
-                PostService.likePost(postId: post.postId ) { err in
-                    print("Completed liking")
+                UserService.fetchUser(by: post.uid) { user in
+                    NotificationService.postLiked(user: self.user!, ownUser: user, post: post) { error in
+                        PostService.likePost(postId: post.postId ) { err in
+                            print("Completed liking")
+                        }
+                    }
                 }
+                
             }
         }
     }
     
     func usernameTapped(cell: PostCell) {
         guard let uid = cell.viewModel?.post.uid else { return }
+        guard let ownUid = Auth.auth().currentUser?.uid else { return }
         fetchUser(uid: uid ) { [weak self] user in
-            let vc = ProfileController(user: user)
-            self?.navigationController?.pushViewController(vc, animated: true)
+            self?.fetchUser(uid: ownUid) { ownUser in
+                let vc = ProfileController(user: user)
+                vc.ownUser = ownUser
+                self?.navigationController?.pushViewController(vc, animated: true)
+            }
+           
             
         }
     }
