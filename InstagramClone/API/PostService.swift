@@ -116,10 +116,44 @@ struct PostService {
         
         COLLECTION_USERS.document(uid).collection("user-likes").document(postId).getDocument { snapshot, error in
             guard let isLiked = snapshot?.exists else { return }
-
+          
             completion(isLiked)
         }
+    }
+    
+    static func uploadComment(post: Post, comment: Comment, completion: @escaping(Error?) -> ()) {
+        
+        let uuid = UUID().uuidString
+        let data: [String: Any] = ["text" : comment.text, "uid" : comment.uid, "username" : comment.username, "profileUrl" : comment.profileUrl, "timestamp" : Timestamp(date: comment.timeStamp)]
+        COLLECTION_POSTS.document(post.postId).collection("post-comments").document(uuid).setData(data) { error in
+            if let error = error {
+                print(error.localizedDescription)
+                return
+            }
+            COLLECTION_USERS.document(post.uid).collection("user-posts").document(post.postId).collection("post-comments").document(uuid).setData(data, completion: completion)
+        }
+    }
+    
+    static func fetchComments(postId: String, completion: @escaping([Comment]) -> ()) {
+        COLLECTION_POSTS.document(postId).collection("post-comments").order(by: "timestamp", descending: true).getDocuments { snapshot, error in
+            guard let docs = snapshot?.documents else { return }
+            
+            let comments: [Comment]? = docs.map({ snapshot in
+                
+                let text = snapshot.data()["text"] as? String ?? ""
+                let uid = snapshot.data()["uid"] as? String ?? ""
+                let username = snapshot.data()["username"] as? String ?? ""
+                let profileUrl = snapshot.data()["profileUrl"] as? String ?? ""
+                let timeStamp = snapshot.data()["timestamp"] as? Date ?? Date()
+                
 
+                let comment = Comment(text: text, uid: uid, username: username, profileUrl: profileUrl, timeStamp: timeStamp)
+                return comment
+            })
+            if let comments = comments {
+                completion(comments)
+            }
+        }
     }
     
 }

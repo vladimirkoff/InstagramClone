@@ -16,9 +16,13 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
         print("Tapped")
     }
     
+    private var isLiked: Bool?
+
     private var actionSheet: ActionSheetLauncher!
+    
     private var posts: [Post]? {
         didSet {
+            
             collectionView.reloadData()
         }
     }
@@ -57,8 +61,9 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     }
     
     func checkIfLiked(postId: String) {
-        PostService.checkIfSaved(postId: postId) { isLiked in
-            print(isLiked)
+       guard let uid = Auth.auth().currentUser?.uid else { return }
+        PostService.checkIfLiked(postId: postId) { isLiked in
+            self.isLiked = isLiked
         }
     }
     
@@ -81,9 +86,8 @@ extension FeedController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PostCell
         cell.delegate = self
-        if let post = posts?[indexPath.row] {
+        if var post = posts?[indexPath.row] {
             cell.viewModel = PostViewModel(post: post)
-            
         }
         return cell
     }
@@ -121,13 +125,10 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
 
 extension FeedController: PostCellDelegate {
     
-    func commentTapped() {
-        let vc = CommentController(collectionViewLayout: UICollectionViewFlowLayout())
+    func commentTapped(post: Post) {
+        let vc = CommentController(post: post)
         navigationController?.pushViewController(vc, animated: true)
     }
-    
-    
-    
     
     func likeTapped(post: Post, cell: PostCell) {
         guard let postId = cell.viewModel?.post.postId else { return }

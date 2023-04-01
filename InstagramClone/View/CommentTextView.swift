@@ -7,16 +7,24 @@
 
 import UIKit
 
-class CommentTextView: UITextView {
+
+protocol CommentTextViewDelegate: class {
+    func postComment(text: String)
+}
+
+class CommentTextView: UIView {
     //MARK: - Properties
     
-    private let placeholderLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Enter comment"
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .lightGray
-        return label
+    weak var delegate: CommentTextViewDelegate?
+        
+    private let commentTextView: InputTextView = {
+        let tv = InputTextView()
+        tv.placeholderLabel.text = "Enter comment"
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        tv.font = UIFont.systemFont(ofSize: 15)
+        tv.isScrollEnabled = false
+        
+        return tv
     }()
     
      private var postButton: UIButton = {
@@ -30,23 +38,32 @@ class CommentTextView: UITextView {
     
     //MARK: - Lifecycle
     
-    override init(frame: CGRect, textContainer: NSTextContainer?) {
-        super.init(frame: frame, textContainer: textContainer)
-        
-        addSubview(placeholderLabel)
-        placeholderLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 8).isActive = true
-        placeholderLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 4).isActive = true
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         autoresizingMask = .flexibleHeight
-        
+
         addSubview(postButton)
-        postButton.backgroundColor = .red
         postButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         postButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
         postButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8).isActive = true
-        postButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 8).isActive = true
+        postButton.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         
-        print(postButton.frame)
+        addSubview(commentTextView)
+        commentTextView.rightAnchor.constraint(equalTo: postButton.leftAnchor, constant: -8).isActive = true
+        commentTextView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
+        commentTextView.topAnchor.constraint(equalTo: self.topAnchor, constant: 8).isActive = true
+        commentTextView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -8).isActive = true
+        
+        let divider = UIView()
+        divider.backgroundColor = .lightGray
+        divider.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(divider)
+        divider.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        divider.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
+        divider.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
+        divider.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
+        
         
         NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: UITextView.textDidChangeNotification, object: nil)
         
@@ -60,10 +77,10 @@ class CommentTextView: UITextView {
     //MARK: - Selectors
     
     @objc func textDidChange() {
-        placeholderLabel.isHidden = !text.isEmpty
+//        commentTextView.placeholderLabel.isHidden = !commentTextView.text.isEmpty
     }
-    
+
     @objc func postComment() {
-        print("Post")
+        delegate?.postComment(text: commentTextView.text)
     }
 }

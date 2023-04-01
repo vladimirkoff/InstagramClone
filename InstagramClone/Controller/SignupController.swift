@@ -20,6 +20,7 @@ class SignupController: UIViewController, FormViewModel {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "plus_photo"), for: .normal)
+        
         button.addTarget(self, action: #selector(chooseImage), for: .touchUpInside)
         button.heightAnchor.constraint(equalToConstant: 140).isActive = true
         button.widthAnchor.constraint(equalToConstant: 140).isActive = true
@@ -170,7 +171,6 @@ extension SignupController: UIImagePickerControllerDelegate & UINavigationContro
         
         
         plusButton.layer.cornerRadius = plusButton.frame.width / 2
-   
         plusButton.layer.masksToBounds = true
         plusButton.layer.borderColor = UIColor.white.cgColor
         plusButton.layer.borderWidth = 2

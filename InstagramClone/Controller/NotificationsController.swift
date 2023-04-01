@@ -8,8 +8,13 @@
 import UIKit
 
 class NotificationsController: UIViewController {
+    //MARK: - Properies
+    
+    //MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemPink
     }
+    
 }

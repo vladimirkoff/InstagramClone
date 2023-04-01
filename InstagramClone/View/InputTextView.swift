@@ -10,7 +10,7 @@ import UIKit
 class InputTextView: UITextView {
     //MARK: - Properties
     
-    private let placeholderLabel: UILabel = {
+    let placeholderLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Your caption"
@@ -39,6 +39,7 @@ class InputTextView: UITextView {
     //MARK: - Selectors
     
     @objc func textDidChange() {
+        print("Here")
         placeholderLabel.isHidden = !text.isEmpty
     }
 }

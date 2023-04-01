@@ -13,7 +13,7 @@ protocol PostCellDelegate: class {
     func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ())  // saving post
     func usernameTapped(cell: PostCell)
     func likeTapped(post: Post, cell: PostCell)
-    func commentTapped()
+    func commentTapped(post: Post)
 }
 
 class PostCell: UICollectionViewCell {
@@ -216,7 +216,8 @@ class PostCell: UICollectionViewCell {
     }
     
     @objc func commentTapped() {
-        delegate?.commentTapped()
+        guard let viewModel = viewModel else { return }
+        delegate?.commentTapped(post: viewModel.post)
     }
     
     @objc func didTapLike() {

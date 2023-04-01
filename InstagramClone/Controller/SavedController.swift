@@ -29,12 +29,16 @@ class SavedController: UICollectionViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = false
         fetchPosts()
     }
     
     @objc func cancel() {
         dismiss(animated: true, completion: nil)
     }
+    
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,7 +64,7 @@ class SavedController: UICollectionViewController {
         navigationItem.title = "Saved posts"
         navigationController?.navigationBar.backgroundColor = .red
         view.backgroundColor = .purple
-        
+        self.tabBarController?.tabBar.isHidden = false
     
         
         collectionView.backgroundColor = .white
