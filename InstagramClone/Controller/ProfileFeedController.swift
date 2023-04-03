@@ -14,7 +14,7 @@ private let reuseIdentifier = "ProfilePostCell"
 
 class ProfileFeedController: UICollectionViewController {
     
-
+    
     private var posts: [Post]?
     private var viewModel: PostViewModel?
     
@@ -22,7 +22,7 @@ class ProfileFeedController: UICollectionViewController {
     
     //MARK: - Lifecycle
     
-
+    
     override func viewWillAppear(_ animated: Bool) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
@@ -93,7 +93,7 @@ extension ProfileFeedController {
         }
         return cell
     }
-   
+    
     //MARK: - Selectors
     
     @objc func handleRefresh() {
@@ -116,6 +116,8 @@ extension ProfileFeedController: UICollectionViewDelegateFlowLayout {
 }
 
 extension ProfileFeedController: PostCellDelegate {
+  
+    
     func shareTapped(post: Post) {
         
     }
@@ -124,16 +126,16 @@ extension ProfileFeedController: PostCellDelegate {
         
     }
     
-    func likeTapped(post: Post, cell: PostCell) {
+    func likeTapped(post: Post, cell: PostCell, completion: @escaping (Error?, LikedUnliked) -> ()) {
         guard let postId = cell.viewModel?.post.postId else { return }
         PostService.checkIfLiked(postId: postId) { isLiked in
             if isLiked {
                 PostService.unlikePost(postId: postId) { error in
-                    print("Completed unliking")
+                    completion(error, .unliked)
                 }
             } else {
                 PostService.likePost(postId: postId ) { err in
-                    print("Completed liking")
+                    completion(err, .liked)
                 }
             }
         }
@@ -148,11 +150,11 @@ extension ProfileFeedController: PostCellDelegate {
     }
     
     func showOptions() {
-//        if true {
-//            actionSheet = ActionSheetLauncher()
-//            self.actionSheet.delegate = self
-//            actionSheet.show()
-//        }
+        //        if true {
+        //            actionSheet = ActionSheetLauncher()
+        //            self.actionSheet.delegate = self
+        //            actionSheet.show()
+        //        }
         print("Show options")
     }
     

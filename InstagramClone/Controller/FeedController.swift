@@ -18,6 +18,12 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     
     private var user: User?
     
+    var customPosts: [Post]? {
+        didSet {
+            
+        }
+    }
+    
     private var actionSheet: ActionSheetLauncher!
         
     private var posts: [Post]? {
@@ -40,14 +46,18 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        fetchPosts()
+        if customPosts == nil {
+            fetchCurrentUser()
+            fetchPosts()
+            return
+        }
+        fetchCurrentUser()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchCurrentUser()
-        fetchPosts()
+//        fetchCurrentUser()
+//        fetchPosts()
         configureUI()
     }
     
@@ -104,13 +114,17 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
 extension FeedController {
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return posts?.count ?? 0
+        return customPosts == nil ? posts?.count ?? 0 : customPosts?.count ?? 0
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PostCell
         cell.delegate = self
         if var post = posts?[indexPath.row] {
+            cell.viewModel = PostViewModel(post: post)
+        }
+        
+        if var post = customPosts?[indexPath.row] {
             cell.viewModel = PostViewModel(post: post)
         }
         return cell
@@ -148,29 +162,35 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
 }
 
 extension FeedController: PostCellDelegate {
+    
     func shareTapped(post: Post) {
-          let text = "Share this post"
-      }
+        
+    }
     
+   
     
+ 
     func commentTapped(post: Post) {
         let vc = CommentController(post: post)
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    func likeTapped(post: Post, cell: PostCell) {
+    func likeTapped(post: Post, cell: PostCell, completion: @escaping (Error?, LikedUnliked) -> ()) {
         PostService.checkIfLiked(postId: post.postId) { isLiked in
             if isLiked {
                 cell.likeButton.setImage(UIImage(named: "like_unselected"), for: .normal)
                 PostService.unlikePost(postId: post.postId) { error in
-                    print("Completed unliking")
+                    completion(error, .unliked)
+                    NotificationService.postUnliked(user: self.user!, post: post) { error in
+                        
+                    }
                 }
             } else {
                 cell.likeButton.setImage(UIImage(named: "like_selected"), for: .normal)
                 UserService.fetchUser(by: post.uid) { user in
-                    NotificationService.postLiked(user: self.user!, ownUser: user, post: post) { error in
+                    NotificationService.postLiked(user: self.user!, post: post) { error in
                         PostService.likePost(postId: post.postId ) { err in
-                            print("Completed liking")
+                            completion(error, .liked)
                         }
                     }
                 }
@@ -181,15 +201,10 @@ extension FeedController: PostCellDelegate {
     
     func usernameTapped(cell: PostCell) {
         guard let uid = cell.viewModel?.post.uid else { return }
-        guard let ownUid = Auth.auth().currentUser?.uid else { return }
+//        guard let ownUid = Auth.auth().currentUser?.uid else { return }
         fetchUser(uid: uid ) { [weak self] user in
-            self?.fetchUser(uid: ownUid) { ownUser in
                 let vc = ProfileController(user: user)
-                vc.ownUser = ownUser
                 self?.navigationController?.pushViewController(vc, animated: true)
-            }
-           
-            
         }
     }
     

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 private let reuseIdentifier = "ProfileCell"
 private let headerIdentifier = "ProfileHeader"
@@ -13,7 +14,7 @@ private let headerIdentifier = "ProfileHeader"
 class ProfileController: UICollectionViewController {
     //MARK: - Properties
     
-    var ownUser: User?
+
     private var user: User
     private var posts: [Post]?
     private var viewModel: PostViewModel?
@@ -192,15 +193,15 @@ extension ProfileController: ProfileHeaderDelegate {
                 }
                 
                 // the notification
-                NotificationService.userFollowed(user: self.user, ownUser: self.ownUser!) { error in
-                    print("Success")
+                guard let uid = Auth.auth().currentUser?.uid else { return }
+                UserService.fetchUser(by: uid) { user in
+                    NotificationService.userFollowed(notifOwner: user, user: self.user) { error in
+                        self.user.isFollowed = true
+                        self.user.numberOfFollowers += 1
+                        self.collectionView.reloadData()
+                    }
                 }
-                
-                self.user.isFollowed = true
-                self.user.numberOfFollowers += 1
-                self.collectionView.reloadData()
             }
         }
     }
-    
 }

@@ -12,9 +12,14 @@ protocol PostCellDelegate: class {
     func showOptions()
     func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ())  // saving post
     func usernameTapped(cell: PostCell)
-    func likeTapped(post: Post, cell: PostCell)
+    func likeTapped(post: Post, cell: PostCell, completion: @escaping(Error?, LikedUnliked) -> ())
     func commentTapped(post: Post)
     func shareTapped(post: Post)
+}
+
+enum LikedUnliked {
+    case liked
+    case unliked
 }
 
 class PostCell: UICollectionViewCell {
@@ -38,7 +43,6 @@ class PostCell: UICollectionViewCell {
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         iv.backgroundColor = .systemPurple
-        iv.isUserInteractionEnabled = true
         iv.isUserInteractionEnabled = true
         return iv
     }()
@@ -106,7 +110,6 @@ class PostCell: UICollectionViewCell {
     
     private let postTimeLabel: UILabel = {
         let label = UILabel()
-        label.text = "2 days ago"
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .lightGray
@@ -186,7 +189,7 @@ class PostCell: UICollectionViewCell {
         captionLabel.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor, constant: 4).isActive = true
         
         addSubview(postTimeLabel)
-        postTimeLabel.topAnchor.constraint(equalTo: captionLabel.bottomAnchor, constant: 8).isActive = true
+        postTimeLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 8).isActive = true
         postTimeLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
         
         addSubview(optionsButton)
@@ -229,7 +232,17 @@ class PostCell: UICollectionViewCell {
     
     @objc func didTapLike() {
         guard let post = viewModel?.post else { return }
-        delegate?.likeTapped(post: post, cell: self)
+        delegate?.likeTapped(post: post, cell: self) { error, like in
+            var currentLikes = Int(self.likesLabel.text!.prefix(1))!
+            switch like {
+            case .liked:
+                self.likesLabel.text = "\(currentLikes + 1) likes"
+                self.likeButton.setImage(UIImage(named: "like_selected"), for: .normal)
+            case .unliked:
+                self.likesLabel.text = "\(currentLikes - 1) likes"
+                self.likeButton.setImage(UIImage(named: "like_unselected"), for: .normal)
+            }
+        }
     }
     
     @objc func saveTapped() {
@@ -255,6 +268,7 @@ class PostCell: UICollectionViewCell {
         usernameLabel.text = viewModel.username
         usernameButton.setTitle(viewModel.username, for: .normal)
         likesLabel.text = viewModel.likes
+        postTimeLabel.text = viewModel.post.time.formatted(date: .abbreviated, time: .omitted)
         
         let likeImage = viewModel.post.isLiked ? "like_selected" : "like_unselected"
         likeButton.setImage(UIImage(named: likeImage), for: .normal)

@@ -33,6 +33,7 @@ struct PostService {
             }
         }
     }
+    
     static func fetchPostsForUser(with uid: String, completion: @escaping([Post]) -> ()) {
         COLLECTION_USERS.document(uid).collection("user-posts").order(by: "timestamp", descending: true).getDocuments { snapshot, err in
             if let error = err {
@@ -104,7 +105,7 @@ struct PostService {
         COLLECTION_POSTS.document(postId).getDocument { snapshot, error in
             guard let snapshot = snapshot?.data() else { return }
             var likes = snapshot["likes"] as! Int
-            likes += 1
+            likes -= 1
             COLLECTION_POSTS.document(postId).updateData(["likes" : likes])
             COLLECTION_USERS.document(uid).collection("user-likes").document(postId).delete()
             COLLECTION_POSTS.document(postId).collection("post-likes").document(uid).delete(completion: completion)
@@ -116,7 +117,7 @@ struct PostService {
         
         COLLECTION_USERS.document(uid).collection("user-likes").document(postId).getDocument { snapshot, error in
             guard let isLiked = snapshot?.exists else { return }
-          
+            
             completion(isLiked)
         }
     }
@@ -146,13 +147,26 @@ struct PostService {
                 let profileUrl = snapshot.data()["profileUrl"] as? String ?? ""
                 let timeStamp = snapshot.data()["timestamp"] as? Date ?? Date()
                 
-
+                
                 let comment = Comment(text: text, uid: uid, username: username, profileUrl: profileUrl, timeStamp: timeStamp)
                 return comment
             })
             if let comments = comments {
                 completion(comments)
             }
+        }
+    }
+    
+    static func fetchPost(postId: String, completion: @escaping([Post]) -> ()) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        COLLECTION_USERS.document(uid).collection("user-posts").document(postId).getDocument { snapshot, error in
+            if let error = error {
+                print("Error fetching post - \(error.localizedDescription)")
+                return
+            }
+            guard let doc = snapshot?.data() else { return }
+            let posts = [Post(dictionary: doc)]
+            completion(posts)
         }
     }
     

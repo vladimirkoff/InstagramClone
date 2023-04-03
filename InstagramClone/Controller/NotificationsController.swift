@@ -9,19 +9,22 @@ import UIKit
 
 private let reuseIdentifier = "NotificationCell"
 
-class NotificationsController: UITableViewController {
+class NotificationsController: UICollectionViewController {
     //MARK: - Properies
     
     private var user: User
+    
     private var notifications: [Notification]? {
-        didSet { tableView.reloadData() }
+        didSet {
+            collectionView.reloadData()
+        }
     }
     
     //MARK: - Lifecycle
     
     init(user: User) {
         self.user = user
-        super.init(nibName: nil, bundle: nil)
+        super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
     
     required init?(coder: NSCoder) {
@@ -31,29 +34,23 @@ class NotificationsController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        fetchFollowed()
-        fetchPostLiked()
-        fetchComment()
+        fetchNotifications()
+        
     }
     
     //MARK: - API
     
-    
-    func fetchFollowed() {
-        NotificationService.fetchUserFollowed(uid: user.uid) { notifications in
-            self.notifications = notifications
-        }
-    }
-    
-    func fetchPostLiked() {
-        NotificationService.fetchPostLiked(uid: user.uid) { notifications in
-            self.notifications = notifications
-        }
-    }
-    
-    func fetchComment() {
-        NotificationService.fetchCommentPost(uid: user.uid) { notifications in
-            self.notifications = notifications
+    func fetchNotifications() {
+        var notificationsArray = [Notification]()
+        NotificationService.fetchUserFollowed { notifications in
+            notificationsArray += notifications
+            NotificationService.fetchPostLiked { notifications in
+                notificationsArray += notifications
+                NotificationService.fetchCommentPost { notifications in
+                    notificationsArray += notifications
+                    self.notifications = notificationsArray
+                }
+            }
         }
     }
     
@@ -62,27 +59,94 @@ class NotificationsController: UITableViewController {
     func configureUI() {
         view.backgroundColor = .white
         navigationItem.title = "Comments"
-        tableView.register(NotificationCell.self, forCellReuseIdentifier: reuseIdentifier)
+        collectionView.register(NotificationCell.self, forCellWithReuseIdentifier: reuseIdentifier)
     }
 }
 
 extension NotificationsController {
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-       let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! NotificationCell
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as!
+        NotificationCell
+        cell.delegate = self
         if let notifications = notifications {
-            print(notifications[indexPath.row].username)
+            cell.notificationType = notifications[indexPath.row].type
+            cell.viewModel = NotificationViewModel(notification: notifications[indexPath.row])
+            if !notifications[indexPath.row].postImage.isEmpty && !notifications[indexPath.row].commentText.isEmpty {
+                cell.viewModel?.notification.postImage = notifications[indexPath.row].postImage
+                cell.viewModel?.notification.commentText = notifications[indexPath.row].commentText
+            }
         }
-       return cell
+        return cell
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return notifications?.count ?? 0
     }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70
-    }
+}
 
+extension NotificationsController: NotificationCellDelegate {
+    func goToPost(cell: NotificationCell) {
+        guard let postId = cell.viewModel?.notification.postId else { return }
+        PostService.fetchPost(postId: postId) { posts in
+            let vc = FeedController(collectionViewLayout: UICollectionViewFlowLayout())
+            vc.customPosts = posts
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+    }
+    
+    
+    func checkIfFollowed(cell: NotificationCell, completion: @escaping (Bool) -> ()) {
+        guard let uid = cell.viewModel?.notification.uid else { return }
+
+        UserService.checkIfFollowed(uid: uid) { isFollowed in
+            if isFollowed {
+                completion(true)
+            } else {
+                completion(false)
+            }
+        }
+    }
+    
+
+    func followButtonTapped(cell: NotificationCell, completion: @escaping(Bool) -> ()) {
+        guard let uid = cell.viewModel?.notification.uid else { return }
+        UserService.checkIfFollowed(uid: uid) { isFollowed in
+            if isFollowed {
+                UserService.unfollow(uid: uid) { error in
+                        if let error = error {
+                            print("Error unfollowing user from notification - \(error.localizedDescription) ")
+                            return
+                    }
+                    completion(false)
+                }
+            } else {
+                UserService.follow(uid: uid) { error in
+                    if let error = error {
+                        print("Error following user from notification - \(error.localizedDescription) ")
+                        return
+                    }
+                    completion(true)
+                }
+            }
+        }
+    }
+    
+    func goToProfile(uid: String) {
+        UserService.fetchUser(by: uid) { user in
+            let vc = ProfileController(user: user)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+}
+
+extension NotificationsController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let viewModel = NotificationViewModel(notification: notifications![indexPath.row])
+        let width: CGFloat = view.frame.width
+        let height: CGFloat = viewModel.size(width: width).height + 50
+        return CGSize(width: width, height: height)
+    }
 }
 

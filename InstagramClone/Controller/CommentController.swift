@@ -14,10 +14,10 @@ class CommentController: UICollectionViewController {
     
     //MARK: - Properties
     
-   lazy private var commentInputView: CommentTextView = {
+    lazy private var commentInputView: CommentTextView = {
         let frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         let cv = CommentTextView(frame: frame )
-       
+        
         cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()
@@ -34,9 +34,9 @@ class CommentController: UICollectionViewController {
     private var comments: [Comment]? {
         didSet {
             collectionView.reloadData()
-            }
         }
-
+    }
+    
     var dismiss: Bool?
     
     override var inputAccessoryView: UIView? {
@@ -49,7 +49,7 @@ class CommentController: UICollectionViewController {
         return dismiss ?? false
     }
     
-   
+    
     
     func fetchUser() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
@@ -59,11 +59,11 @@ class CommentController: UICollectionViewController {
     }
     
     lazy private var underline: UIView = {
-         let view = UIView()
-         view.translatesAutoresizingMaskIntoConstraints = false
-         view.backgroundColor = .lightGray
-         return view
-     }()
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .lightGray
+        return view
+    }()
     
     //MARK: - Lifecycle
     
@@ -109,7 +109,7 @@ class CommentController: UICollectionViewController {
         commentInputView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 8).isActive = true
         commentInputView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         commentInputView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-    
+        
     }
     
     //MARK: - API
@@ -145,7 +145,6 @@ extension CommentController {
 
 extension CommentController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-      
         
         let viewModel = CommentViewModel(comment: comments![indexPath.row])
         let width: CGFloat = view.frame.width
@@ -162,12 +161,11 @@ extension CommentController: CommentTextViewDelegate {
         commentInputView.commentTextView.text = ""
         commentInputView.commentTextView.resignFirstResponder()
         
-        
         let comment = Comment(text: text, uid: user.uid, username: user.username, profileUrl: user.profileImageUrl, timeStamp: Date())
         PostService.uploadComment(post: post!, comment: comment) { error in
             guard let uid = self.post?.uid else { return }
             UserService.fetchUser(by: uid) { postUser in
-                NotificationService.commentedPost(user: postUser, ownUser: self.user!, post: self.post!, comment: comment) { error in
+                NotificationService.commentedPost(user: self.user!, post: self.post!, comment: comment) { error in
                     print("Success")
                     self.fetchComments()
                 }

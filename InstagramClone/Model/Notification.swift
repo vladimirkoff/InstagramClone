@@ -13,4 +13,6 @@ struct Notification {
     var postId = ""
     var postImage = ""
     var commentText = ""
+    let uid: String
+    var type = NotificationType.follow
 }
