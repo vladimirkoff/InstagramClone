@@ -25,6 +25,8 @@ class ProfileFeedController: UICollectionViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
+        self.navigationController?.navigationBar.isHidden = true
+        
         
         if let profile = profile {
             if profile {
@@ -35,6 +37,8 @@ class ProfileFeedController: UICollectionViewController {
         }
         
     }
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()

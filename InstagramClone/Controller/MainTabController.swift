@@ -102,7 +102,6 @@ class MainTabController: UITabBarController {
 extension MainTabController: AuthDelegate {
     func authComplete() {
         fetchUser()
-        self.dismiss(animated: true)
     }
 }
 

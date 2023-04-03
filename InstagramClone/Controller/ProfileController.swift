@@ -34,6 +34,7 @@ class ProfileController: UICollectionViewController {
         super.viewWillAppear(animated)
         configureUI()
         fetchPosts(uid: user.uid)
+        fetchUser()
         
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.isHidden = false
@@ -51,6 +52,12 @@ class ProfileController: UICollectionViewController {
         PostService.fetchPostsForUser(with: uid) { [weak self] posts in
             self?.posts = posts
             self?.collectionView.reloadData()
+        }
+    }
+    
+    func fetchUser() {
+        UserService.fetchUser(by: user.uid) { user in
+            self.user = user
         }
     }
     
@@ -158,6 +165,10 @@ extension ProfileController: ProfileHeaderDelegate {
         switch action {
         case .list:
             let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
+            vc.profile = true
+            vc.navigationController?.navigationBar.barStyle = .default
+           
+
             navigationController?.pushViewController(vc, animated: true)
         case .posts:
             let vc = ProfileController(user: user)
@@ -174,31 +185,39 @@ extension ProfileController: ProfileHeaderDelegate {
     
     func header(_ profileHeader: ProfileHeader, didTapActionButton forUser: User) {
         if user.isCurrentUser {
-            let vc = EditProfileController()
+            let vc = EditProfileController(user: self.user)
             navigationController?.pushViewController(vc, animated: true)
         } else if user.isFollowed {
+
             UserService.unfollow(uid: user.uid) { [weak self] error in
                 if let error = error {
                     print("Error following user - \(error.localizedDescription)")
                 }
+                guard let uid = Auth.auth().currentUser?.uid else { return }
+                UserService.fetchUser(by: uid) { user in
+                    NotificationService.unfollowed(notifOwner: user, user: forUser) { error in
+                        
+                    }
+                }
+                
                 self?.user.isFollowed = false
                 self?.user.numberOfFollowers -= 1
                 self?.collectionView.reloadData()
             }
         } else {
             UserService.follow(uid: user.uid) { [weak self] error  in
-                guard let self = self else{ return }
                 if let error = error {
                     print("Error following user - \(error.localizedDescription)")
                 }
                 
                 // the notification
                 guard let uid = Auth.auth().currentUser?.uid else { return }
-                UserService.fetchUser(by: uid) { user in
-                    NotificationService.userFollowed(notifOwner: user, user: self.user) { error in
-                        self.user.isFollowed = true
-                        self.user.numberOfFollowers += 1
-                        self.collectionView.reloadData()
+                UserService.fetchUser(by: uid) { ownerUser in
+                    guard let user = self?.user else { return }
+                    NotificationService.userFollowed(notifOwner: ownerUser, user: user) { error in
+                        self?.user.isFollowed = true
+                        self?.user.numberOfFollowers += 1
+                        self?.collectionView.reloadData()
                     }
                 }
             }

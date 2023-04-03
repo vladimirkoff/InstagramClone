@@ -46,6 +46,8 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+
         if customPosts == nil {
             fetchCurrentUser()
             fetchPosts()

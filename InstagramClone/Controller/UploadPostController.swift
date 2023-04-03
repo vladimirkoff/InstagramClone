@@ -15,7 +15,9 @@ class UploadPostController: UIViewController {
     
     var imageData: Data?
     
-    let hud = JGProgressHUD(style: .dark)
+   private let hud = JGProgressHUD(style: .dark)
+    
+    private var restrictedText = ""
     
     
     private let postImage: UIImageView = {
@@ -45,6 +47,16 @@ class UploadPostController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "0/100"
         label.textColor = .lightGray
+        label.font = UIFont.systemFont(ofSize: 14)
+        return label
+    }()
+    
+    lazy private var warning: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Max number of symbols!"
+        label.textColor = .red
+        label.isHidden = true
         label.font = UIFont.systemFont(ofSize: 14)
         return label
     }()
@@ -91,6 +103,10 @@ class UploadPostController: UIViewController {
         view.addSubview(numberOfSymbols)
         numberOfSymbols.bottomAnchor.constraint(equalTo: underline.topAnchor, constant: -8).isActive = true
         numberOfSymbols.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8).isActive = true
+        
+        view.addSubview(warning)
+        warning.rightAnchor.constraint(equalTo: numberOfSymbols.leftAnchor, constant: -8).isActive = true
+        warning.bottomAnchor.constraint(equalTo: underline.topAnchor, constant: -8).isActive = true
     }
     
     func showLoader(_ show: Bool) {
@@ -132,7 +148,20 @@ class UploadPostController: UIViewController {
 extension UploadPostController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         let num = textView.text.count
+        
+        if num == 100 {
+            restrictedText = textView.text
+        } else if num > 100 {
+            textView.text = restrictedText
+            warning.isHidden = false
+        } else {
+            warning.isHidden = true
+        }
+        
         numberOfSymbols.text = "\(num)/100"
     }
+    
+    
+    
 }
 

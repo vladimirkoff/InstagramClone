@@ -95,5 +95,36 @@ struct UserService {  // fetching user information
             completion(snapshot.count)
         }
     }
+    
+    static func updateUser(changedUser: User, completion: @escaping(String) -> ()) {
+        print(changedUser.uid)
+        COLLECTION_USERS.document(changedUser.uid).getDocument { snapshot, error in
+            if var user = snapshot?.reference {
+                self.updateUserInPosts(uid: changedUser.uid, username: changedUser.username, url: changedUser.profileImageUrl) { error in
+                    user.updateData(["profileImageUrl" : changedUser.profileImageUrl])
+                    user.updateData(["username" : changedUser.username])
+                    user.updateData(["fullName" : changedUser.fullName])
+                    completion("error")
+                }
+                
+            }
+        }
+    }
+    
+    static func updateUserInPosts(uid: String, username: String, url: String, completion: @escaping(String) -> ()) {
+        COLLECTION_POSTS.getDocuments { snapshot, error in
+            guard let docs = snapshot?.documents else { return }
+            
+            for doc in docs {
+                var user = doc.reference
+                if doc.data()["ownerUid"] as? String ?? "" == uid {
+                    user.updateData(["profileImage" : url])
+                    user.updateData(["username" : username])
+                }
+            }
+            completion("error")
+        }
+    }
+    
 }
 

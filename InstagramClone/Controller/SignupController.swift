@@ -130,6 +130,8 @@ class SignupController: UIViewController, FormViewModel {
                 print(error.localizedDescription)
             }
             self.delegate?.authComplete()
+            let vc = MainTabController()
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     

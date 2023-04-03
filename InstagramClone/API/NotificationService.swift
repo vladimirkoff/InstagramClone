@@ -111,4 +111,30 @@ struct NotificationService {
             }
         }
     }
+    
+    static func unfollowed(notifOwner: User, user: User,  completion: @escaping(Error?) -> ()) {
+        print(notifOwner.uid)
+        print(user.uid)
+        COLLECTION_NOTIFICATIONS.document(user.uid).collection("notifications-followed").getDocuments { snapshot, error in
+            guard let docs = snapshot?.documents else { return }
+            docs.forEach { snapshot in
+                if snapshot["uid"] as? String ?? "" == notifOwner.uid {
+                    COLLECTION_NOTIFICATIONS.document(user.uid).collection("notifications-followed").document(snapshot.documentID).delete()
+                }
+            }
+        }
+    }
+    
+//    static func commentDeleted(user: User, post: Post, completion: @escaping(Error?) -> ()) {
+//        guard user.uid != post.uid else { return }
+//
+//        COLLECTION_NOTIFICATIONS.document(post.uid).collection("notifications-postLiked").getDocuments { snapshot, error in
+//            guard let docs = snapshot?.documents else { return }
+//            docs.forEach { snapshot in
+//                if snapshot.data()["postId"] as? String ?? "" == post.postId {
+//                    COLLECTION_NOTIFICATIONS.document(post.uid).collection("notifications-postLiked").document(snapshot.documentID).delete()
+//                }
+//            }
+//        }
+//    }
 }

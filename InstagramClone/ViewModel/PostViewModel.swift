@@ -5,7 +5,7 @@
 //  Created by Vladimir Kovalev on 25.03.2023.
 //
 
-import Foundation
+import UIKit
 
 struct PostViewModel {
     
@@ -30,5 +30,7 @@ struct PostViewModel {
     init(post: Post) {
         self.post = post
     }
+    
+
     
 }

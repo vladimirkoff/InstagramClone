@@ -39,7 +39,6 @@ class InputTextView: UITextView {
     //MARK: - Selectors
     
     @objc func textDidChange() {
-        print("Here")
         placeholderLabel.isHidden = !text.isEmpty
     }
 }

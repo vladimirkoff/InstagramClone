@@ -127,13 +127,16 @@ class LoginController: UIViewController, FormViewModel {
     @objc func logIn() {
         guard let email = emailField.text else { return }
         guard let password = passwordField.text else { return }
+        
         Auth.auth().signIn(withEmail: email, password: password) { res, err in
             if let error = err {
                 print("Error logging in - \(error.localizedDescription)")
                 return
             }
             self.delegate?.authComplete()
-            
+            let vc = MainTabController()
+//            vc.navigationController?.navigationBar.isHidden = true
+            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
 }
