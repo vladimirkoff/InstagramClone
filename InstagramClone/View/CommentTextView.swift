@@ -65,7 +65,7 @@ class CommentTextView: UIView {
         divider.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
         
         
-        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: UITextView.textDidChangeNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: UITextView.textDidChangeNotification, object: nil)
         
         
     }
@@ -76,9 +76,9 @@ class CommentTextView: UIView {
     
     //MARK: - Selectors
     
-    @objc func textDidChange() {
-//        commentTextView.placeholderLabel.isHidden = !commentTextView.text.isEmpty
-    }
+//    @objc func textDidChange() {
+////        commentTextView.placeholderLabel.isHidden = !commentTextView.text.isEmpty
+//    }
 
     @objc func postComment() {
         delegate?.postComment(text: commentTextView.text)

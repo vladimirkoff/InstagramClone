@@ -12,7 +12,7 @@ struct PostViewModel {
     var post: Post
     
     var profileImageUrl: URL? {
-        return URL(string: post.profileImage) 
+        return URL(string: post.profileImage)
     }
     
     var caption: String? {
@@ -30,7 +30,5 @@ struct PostViewModel {
     init(post: Post) {
         self.post = post
     }
-    
 
-    
 }

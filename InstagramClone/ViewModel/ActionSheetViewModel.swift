@@ -23,11 +23,13 @@ struct ActionSheetViewModel {
         case .delete:
             return UIImage(systemName: "trash")!
         case .report:
-            return UIImage(systemName: "externaldrive.fill.trianglebadge.exclamationmark")!
+            return UIImage(systemName: "exclamationmark.triangle.fill")!
         case .save:
             return UIImage(named: "ribbon")!
         case .checkProfile:
             return UIImage(named: "profile_selected")!
+        case .share:
+            return UIImage(systemName: "square.and.arrow.up")!
         }
     }
     

@@ -105,7 +105,7 @@ extension NotificationsController: NotificationCellDelegate {
     
     func checkIfFollowed(cell: NotificationCell, completion: @escaping (Bool) -> ()) {
         guard let uid = cell.viewModel?.notification.uid else { return }
-
+        
         UserService.checkIfFollowed(uid: uid) { isFollowed in
             if isFollowed {
                 completion(true)
@@ -115,15 +115,15 @@ extension NotificationsController: NotificationCellDelegate {
         }
     }
     
-
+    
     func followButtonTapped(cell: NotificationCell, completion: @escaping(Bool) -> ()) {
         guard let uid = cell.viewModel?.notification.uid else { return }
         UserService.checkIfFollowed(uid: uid) { isFollowed in
             if isFollowed {
                 UserService.unfollow(uid: uid) { error in
-                        if let error = error {
-                            print("Error unfollowing user from notification - \(error.localizedDescription) ")
-                            return
+                    if let error = error {
+                        print("Error unfollowing user from notification - \(error.localizedDescription) ")
+                        return
                     }
                     completion(false)
                 }

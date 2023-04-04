@@ -15,7 +15,7 @@ class UploadPostController: UIViewController {
     
     var imageData: Data?
     
-   private let hud = JGProgressHUD(style: .dark)
+    private let hud = JGProgressHUD(style: .dark)
     
     private var restrictedText = ""
     
@@ -36,11 +36,11 @@ class UploadPostController: UIViewController {
     }()
     
     lazy private var underline: UIView = {
-         let view = UIView()
-         view.translatesAutoresizingMaskIntoConstraints = false
-         view.backgroundColor = .lightGray
-         return view
-     }()
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .lightGray
+        return view
+    }()
     
     lazy private var numberOfSymbols: UILabel = {
         let label = UILabel()
@@ -78,7 +78,7 @@ class UploadPostController: UIViewController {
     func configureUI() {
         navigationItem.title = "Post"
         textView.delegate = self
-
+        
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action:    #selector(cancelPressed))
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Share", style: .done, target: self, action: #selector(sharePressed))
         
@@ -136,10 +136,10 @@ class UploadPostController: UIViewController {
                 print("ERROR uploadding post = \(error.localizedDescription)")
                 return
             }
-                self?.navigationController?.popViewController(animated: true)
-            }
+            self?.navigationController?.popViewController(animated: true)
         }
     }
+}
 
 
 //MARK: - UITextViewDelegate

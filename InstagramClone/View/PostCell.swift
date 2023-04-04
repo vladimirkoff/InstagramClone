@@ -14,7 +14,7 @@ protocol PostCellDelegate: AnyObject {
     func usernameTapped(cell: PostCell)
     func likeTapped(post: Post, cell: PostCell, completion: @escaping(Error?, LikedUnliked) -> ())
     func commentTapped(post: Post)
-    func shareTapped(post: Post)
+    func shareTapped(cell: PostCell)
 }
 
 enum LikedUnliked {
@@ -207,8 +207,7 @@ class PostCell: UICollectionViewCell {
     //MARK: - Selectors
     
     @objc func shareTapped() {
-        guard let viewModel = viewModel else { return }
-        delegate?.shareTapped(post: viewModel.post)
+        delegate?.shareTapped(cell: self)
     }
     
     @objc func didTapUsername() {

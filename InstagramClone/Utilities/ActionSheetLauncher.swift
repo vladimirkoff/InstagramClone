@@ -14,10 +14,12 @@ enum ActionType: String {
     case report = "Report post"
     case save = "Save post"
     case checkProfile = "Go to profile"
+    case share = "Share post"
 }
 
 protocol ActionSheetDelegate: class {
     func goToProfile(user: User)
+    func sharePostFromActionSheet(cell: PostCell)
 }
 
 private let reuseIdentifier = "ActionCell"
@@ -69,6 +71,8 @@ class ActionSheetLauncher: NSObject {
     
     private var window: UIWindow?
     
+    private var cell: PostCell?
+    
     //MARK: - Lifecycle
     
     init(user: User, post: Post) {
@@ -77,10 +81,13 @@ class ActionSheetLauncher: NSObject {
         super.init()
     }
     
+    
+    
     //MARK: - Helpers
     
-    func show() {
+    func show(cell: PostCell) {
         configureTableView()
+        self.cell = cell
         
         guard let window = UIApplication.shared.windows.first(where: {$0.isKeyWindow }) else { return }
         self.window = window
@@ -89,7 +96,7 @@ class ActionSheetLauncher: NSObject {
         blackView.frame = window.frame
         
         window.addSubview(tableView)
-        let height = CGFloat(3 * 60) + 100
+        let height = CGFloat(4 * 60) + 100
         tableView.frame = CGRect(x: 0 , y: window.frame.height, width: window.frame.width, height: height)
         
         UIView.animate(withDuration: 0.5) {
@@ -117,24 +124,24 @@ class ActionSheetLauncher: NSObject {
     @objc func dismiss() {
         UIView.animate(withDuration: 0.5) {
             self.blackView.alpha = 0
-            self.tableView.frame.origin.y += 300
+            self.tableView.frame.origin.y += 380
         }
     }
 }
 
 extension ActionSheetLauncher: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 4
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! ActionSheetCell
         if let uid = Auth.auth().currentUser?.uid {
             if uid == user.uid {
-                let options: [ActionType] = [ .delete, .save, .checkProfile ]
+                let options: [ActionType] = [ .delete, .save, .checkProfile, .share ]
                 cell.viewModel = ActionSheetViewModel(user: user, type: options[indexPath.row])
             } else {
-                let options: [ActionType] = [ .report, .save, .checkProfile ]
+                let options: [ActionType] = [ .report, .save, .checkProfile, .share ]
                 cell.viewModel = ActionSheetViewModel(user: user, type: options[indexPath.row] )
             }
         }
@@ -168,6 +175,8 @@ extension ActionSheetLauncher: UITableViewDataSource, UITableViewDelegate {
                 self.dismiss()
                 self.delegate?.goToProfile(user: user)
             }
+        case 3:
+            delegate?.sharePostFromActionSheet(cell: cell!)
         default:
             print("Error")
         }

@@ -16,7 +16,7 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
     private var user: User
     
     private let hud = JGProgressHUD(style: .dark)
-
+    
     
     var infoChanged: Bool? {
         didSet {
@@ -24,16 +24,16 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
         }
     }
     
-   lazy private var changeProfilePhotoButton: UIButton = {
+    lazy private var changeProfilePhotoButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.sd_setImage(with: URL(string: user.profileImageUrl), for: .normal)
-       button.clipsToBounds = true
- 
+        button.clipsToBounds = true
+        
         button.addTarget(self, action: #selector(chooseImage), for: .touchUpInside)
         button.heightAnchor.constraint(equalToConstant: 140).isActive = true
         button.widthAnchor.constraint(equalToConstant: 140).isActive = true
-       button.layer.cornerRadius = 140 / 2
+        button.layer.cornerRadius = 140 / 2
         return button
     }()
     

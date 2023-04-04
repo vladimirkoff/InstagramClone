@@ -38,12 +38,14 @@ class ProfileController: UICollectionViewController {
         
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.isHidden = false
+        
        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .orange
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "gear"), style: .plain, target: self, action: #selector(goToEdit))
     }
     
     //MARK: - API
@@ -96,6 +98,11 @@ class ProfileController: UICollectionViewController {
     @objc func handleRefresh() {
         collectionView.reloadData()
         self.collectionView.refreshControl?.endRefreshing()
+    }
+    
+    @objc func goToEdit() {
+        let vc = EditProfileController(user: self.user)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 

@@ -84,48 +84,32 @@ struct PostService {
         COLLECTION_USERS.document(uid).collection("user-saved").document(postId).delete(completion: completion)
     }
     
-    static func likePost(postId: String, completion:@escaping(FirestoreCompletion) -> ()) {
+    static func likePost(post: Post, completion:@escaping(FirestoreCompletion) -> ()) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
-        COLLECTION_POSTS.document(postId).getDocument { snapshot, err in
+        COLLECTION_POSTS.document(post.postId).getDocument { snapshot, err in
             guard let snapshot = snapshot?.data() else { return }
             var data = snapshot
             var likes = snapshot["likes"] as! Int
             likes += 1
             data["likes"] = likes
-            COLLECTION_POSTS.document(postId).updateData(["likes": likes])
-            COLLECTION_POSTS.document(postId).collection("post-likes").document(uid).setData(["userId" : uid])
-            COLLECTION_USERS.document(uid).collection("user-likes").document(postId).setData(data)
-            COLLECTION_USERS.getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error - \(error.localizedDescription)")
-                    return
-                }
-                guard let users = snapshot?.documents else { return }
-                for user in users {
-                     let posts = user.reference.collection("user-saved").getDocuments(completion: { snapshot, error in
-                        guard let posts = snapshot?.documents else { return }
-                        for post in posts {
-                            if post.documentID == postId {
-                                post.reference.updateData(["likes" : likes])
-                            }
-                        }
-                    })
-                }
-            }
+            COLLECTION_POSTS.document(post.postId).updateData(["likes": likes])
+            COLLECTION_POSTS.document(post.postId).collection("post-likes").document(uid).setData(["userId" : uid])
+            COLLECTION_USERS.document(uid).collection("user-likes").document(post.postId).updateData(["likes"  : likes])
+            COLLECTION_USERS.document(post.uid).collection("user-posts").document(post.postId).updateData(["likes" : likes])
         }
     }
     
-    static func unlikePost(postId: String, completion: @escaping(FirestoreCompletion) ) {
+    static func unlikePost(post: Post, completion: @escaping(FirestoreCompletion) ) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
-        COLLECTION_POSTS.document(postId).getDocument { snapshot, error in
+        COLLECTION_POSTS.document(post.postId).getDocument { snapshot, error in
             guard let snapshot = snapshot?.data() else { return }
             var likes = snapshot["likes"] as! Int
             likes -= 1
-            COLLECTION_POSTS.document(postId).updateData(["likes" : likes])
-            COLLECTION_USERS.document(uid).collection("user-likes").document(postId).delete()
-            COLLECTION_POSTS.document(postId).collection("post-likes").document(uid).delete(completion: completion)
+            COLLECTION_POSTS.document(post.postId).updateData(["likes" : likes])
+            COLLECTION_USERS.document(uid).collection("user-likes").document(post.postId).delete()
+            COLLECTION_POSTS.document(post.postId).collection("post-likes").document(uid).delete(completion: completion)
         }
     }
     

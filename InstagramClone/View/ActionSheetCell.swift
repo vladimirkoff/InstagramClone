@@ -20,7 +20,6 @@ class ActionSheetCell: UITableViewCell {
         iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
         iv.image = UIImage(systemName: "trash.fill")
-        iv.tintColor = .red
         return iv
     }()
     
@@ -56,6 +55,15 @@ class ActionSheetCell: UITableViewCell {
         
         titleLabel.text = viewModel.title
         optionImageView.image = viewModel.image
+        
+        switch viewModel.type {
+        case .share:
+            optionImageView.tintColor = .black
+        case .delete, .report:
+            optionImageView.tintColor = .red
+        default:
+            print("here")
+        }
     }
     
     

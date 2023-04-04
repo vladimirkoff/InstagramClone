@@ -17,7 +17,6 @@ class CommentController: UICollectionViewController {
     lazy private var commentInputView: CommentTextView = {
         let frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50)
         let cv = CommentTextView(frame: frame )
-        
         cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()

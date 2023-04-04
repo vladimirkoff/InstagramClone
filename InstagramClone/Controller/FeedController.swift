@@ -26,24 +26,25 @@ class FeedController: UICollectionViewController {
     
     var post: [Post]?
     
+   private var activityVC: UIActivityViewController? = nil
+    
     let postsType: PostsType
     
     private var actionSheet: ActionSheetLauncher?
-        
+    
     private var posts: [Post]? {
         didSet {
             collectionView.reloadData()
         }
     }
     
-
     
     //MARK: - Lifecycle
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.isHidden = false
-
+        
         switch postsType {
             
         case .feed:
@@ -82,6 +83,12 @@ class FeedController: UICollectionViewController {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         collectionView.refreshControl = refreshControl
+    }
+    
+    func sharePost(cell: PostCell) {
+        guard let viewModel = cell.viewModel else { return }
+        activityVC = UIActivityViewController(activityItems: [viewModel.post.imageUrl], applicationActivities: nil)
+        present(activityVC!, animated: true)
     }
     //MARK: - API
     
@@ -200,10 +207,10 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
 
 extension FeedController: PostCellDelegate {
     
-    func shareTapped(post: Post) {
-        
+    func shareTapped(cell: PostCell) {
+        sharePost(cell: cell)
     }
-
+    
     func commentTapped(post: Post) {
         let vc = CommentController(post: post)
         navigationController?.pushViewController(vc, animated: true)
@@ -213,17 +220,18 @@ extension FeedController: PostCellDelegate {
         PostService.checkIfLiked(postId: post.postId) { isLiked in
             if isLiked {
                 cell.likeButton.setImage(UIImage(named: "like_unselected"), for: .normal)
-                PostService.unlikePost(postId: post.postId) { error in
+                PostService.unlikePost(post: post) { error in
                     completion(error, .unliked)
                     NotificationService.postUnliked(user: self.user, post: post) { error in
                         
                     }
                 }
-            } else {
+            }
+            else {
                 cell.likeButton.setImage(UIImage(named: "like_selected"), for: .normal)
                 UserService.fetchUser(by: post.uid) { user in
                     NotificationService.postLiked(user: self.user, post: post) { error in
-                        PostService.likePost(postId: post.postId ) { err in
+                        PostService.likePost(post: post ) { err in
                             completion(error, .liked)
                         }
                     }
@@ -235,8 +243,8 @@ extension FeedController: PostCellDelegate {
     func usernameTapped(cell: PostCell) {
         guard let uid = cell.viewModel?.post.uid else { return }
         fetchUser(uid: uid ) { [weak self] user in
-                let vc = ProfileController(user: user)
-                self?.navigationController?.pushViewController(vc, animated: true)
+            let vc = ProfileController(user: user)
+            self?.navigationController?.pushViewController(vc, animated: true)
         }
     }
     
@@ -244,7 +252,7 @@ extension FeedController: PostCellDelegate {
         UserService.fetchUser(by: cell.viewModel!.post.uid) { user in
             self.actionSheet = ActionSheetLauncher(user: user, post: cell.viewModel!.post)
             self.actionSheet?.delegate = self
-            self.actionSheet!.show()
+            self.actionSheet!.show(cell: cell)
         }
     }
     
@@ -267,6 +275,10 @@ extension FeedController: PostCellDelegate {
 //MARK: - ActionSheetDelegate
 
 extension FeedController: ActionSheetDelegate {
+    func sharePostFromActionSheet(cell: PostCell) {
+        sharePost(cell: cell)
+    }
+    
     func goToProfile(user: User) {
         let vc = ProfileController(user: user)
         navigationController?.pushViewController(vc, animated: true)

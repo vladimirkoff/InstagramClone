@@ -15,7 +15,7 @@ class SavedController: UICollectionViewController {
     private var user: User
     private var posts: [Post]?
     private var viewModel: PostViewModel?
-        
+    
     //MARK: - Lifecycle
     
     init(user: User) {
@@ -57,7 +57,7 @@ class SavedController: UICollectionViewController {
         navigationItem.title = "Saved posts"
         navigationController?.navigationBar.backgroundColor = .red
         view.backgroundColor = .purple
-    
+        
         
         collectionView.backgroundColor = .white
         collectionView.register(ProfileCell.self, forCellWithReuseIdentifier: reuseIdentifier)
@@ -92,7 +92,7 @@ extension SavedController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return posts?.count ?? 0
     }
-
+    
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = FeedController(user: user, postsType: .saved)
         navigationController?.pushViewController(vc, animated: true)

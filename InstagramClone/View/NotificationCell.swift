@@ -41,6 +41,10 @@ class NotificationCell: UICollectionViewCell {
          iv.clipsToBounds = true
          iv.isUserInteractionEnabled = true
          iv.addGestureRecognizer(configGestureRecognizer())
+        
+        let gestureRecognizer = UITapGestureRecognizer()
+        gestureRecognizer.addTarget(self, action: #selector(goToProfile))
+        iv.addGestureRecognizer(gestureRecognizer)
          return iv
      }()
     
@@ -119,9 +123,6 @@ class NotificationCell: UICollectionViewCell {
         profileImage.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
         profileImage.layer.cornerRadius = 40 / 2
         profileImage.isUserInteractionEnabled = true
-        let gestureRecognizer = UITapGestureRecognizer()
-        gestureRecognizer.addTarget(self, action: #selector(goToProfile))
-        profileImage.addGestureRecognizer(gestureRecognizer)
         
         addSubview(username)
         username.leftAnchor.constraint(equalTo: profileImage.rightAnchor, constant: 8).isActive = true

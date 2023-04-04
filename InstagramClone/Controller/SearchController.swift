@@ -23,7 +23,7 @@ class SearchController: UITableViewController {
     
     
     //MARK: - Lifecycle
-   
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureTableView()
@@ -64,35 +64,35 @@ class SearchController: UITableViewController {
         }
     }
 }
-    
-    //MARK: -  UITableViewDataSource
-    
-    extension SearchController {
-        override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            return inSearchMode ? sortedUsers.count : users.count
-        }
-        override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! UserCell
-            let user = inSearchMode ? sortedUsers[indexPath.row] : users[indexPath.row]
-            cell.viewModel = UserCellViewModel(user: user)
-            return cell
-        }
-        override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            let user = inSearchMode ? sortedUsers[indexPath.row] : users[indexPath.row]
-            let vc = ProfileController(user: user)
-            navigationController?.pushViewController(vc, animated: true)
-        }
+
+//MARK: -  UITableViewDataSource
+
+extension SearchController {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return inSearchMode ? sortedUsers.count : users.count
     }
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! UserCell
+        let user = inSearchMode ? sortedUsers[indexPath.row] : users[indexPath.row]
+        cell.viewModel = UserCellViewModel(user: user)
+        return cell
+    }
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let user = inSearchMode ? sortedUsers[indexPath.row] : users[indexPath.row]
+        let vc = ProfileController(user: user)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+}
 
 //MARK: - UISearchResultsUpdating
 
-    extension SearchController: UISearchResultsUpdating {
-        func updateSearchResults(for searchController: UISearchController) {
-            guard let searchText = searchController.searchBar.text?.lowercased() else { return }
-            
-            sortedUsers = users.filter({$0.username.lowercased().contains(searchText) || $0.fullName.lowercased().contains(searchText )})
-            tableView.reloadData()
+extension SearchController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let searchText = searchController.searchBar.text?.lowercased() else { return }
         
-        }
+        sortedUsers = users.filter({$0.username.lowercased().contains(searchText) || $0.fullName.lowercased().contains(searchText )})
+        tableView.reloadData()
+        
     }
+}
 
