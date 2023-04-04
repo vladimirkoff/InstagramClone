@@ -119,7 +119,6 @@ class UploadPostController: UIViewController {
         }
     }
     
-    
     //MARK: - Selectors
     
     @objc func cancelPressed() {

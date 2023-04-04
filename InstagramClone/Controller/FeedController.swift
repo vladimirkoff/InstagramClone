@@ -42,7 +42,7 @@ class FeedController: UICollectionViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
+        self.navigationController?.navigationBar.isHidden = false
 
         switch postsType {
             
@@ -171,16 +171,15 @@ extension FeedController {
     
     @objc func handleRefresh() {
         switch postsType {
+            
         case .feed:
             fetchPosts()
-            return
         case .profile:
             fetchPostsForUser(withUid: user.uid)
         case .saved:
             fetchSavedPosts()
         case .single:
-            self.posts = self.post
-
+            posts = post
         }
         self.collectionView.refreshControl?.endRefreshing()
     }

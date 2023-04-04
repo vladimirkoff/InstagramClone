@@ -7,11 +7,16 @@
 
 import UIKit
 import SDWebImage
+import JGProgressHUD
+
 
 class EditProfileController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     //MARK: - Properties
     
     private var user: User
+    
+    private let hud = JGProgressHUD(style: .dark)
+
     
     var infoChanged: Bool? {
         didSet {
@@ -96,7 +101,7 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(saveChanges))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(saveChanges))
         navigationItem.rightBarButtonItem?.isEnabled = false
         
         view.addSubview(changeProfilePhotoButton)
@@ -142,6 +147,7 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
     }
     
     @objc func saveChanges() {
+        hud.show(in: view)
         let fullName = fullNameField.text
         let username = usernameField.text
         let uid = user.uid
@@ -150,7 +156,7 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
             let data: [String : Any] = ["profileImageUrl" : url, "username" : username!, "fullName" : fullName!, "uid" : uid]
             let user = User(dictionary: data)
             UserService.updateUser(changedUser: user, completion: { error in
-                print("Completed")
+                self.hud.dismiss()
                 self.navigationController?.popViewController(animated: true)
             })
         }

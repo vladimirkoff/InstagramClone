@@ -33,13 +33,6 @@ class SavedController: UICollectionViewController {
         fetchPosts()
     }
     
-    @objc func cancel() {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -58,7 +51,7 @@ class SavedController: UICollectionViewController {
         }
     }
     
-    //MARK: - Helper
+    //MARK: - Helpers
     
     func configureUI() {
         navigationItem.title = "Saved posts"
@@ -79,6 +72,10 @@ class SavedController: UICollectionViewController {
     @objc func handleRefresh() {
         collectionView.reloadData()
         self.collectionView.refreshControl?.endRefreshing()
+    }
+    
+    @objc func cancel() {
+        navigationController?.popViewController(animated: true)
     }
 }
 

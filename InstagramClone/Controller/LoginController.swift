@@ -135,7 +135,6 @@ class LoginController: UIViewController, FormViewModel {
             }
             self.delegate?.authComplete()
             let vc = MainTabController()
-//            vc.navigationController?.navigationBar.isHidden = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }

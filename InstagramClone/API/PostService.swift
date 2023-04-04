@@ -84,7 +84,7 @@ struct PostService {
         COLLECTION_USERS.document(uid).collection("user-saved").document(postId).delete(completion: completion)
     }
     
-    static func likePost(postId: String, completion:@escaping(Error?) -> ()) {
+    static func likePost(postId: String, completion:@escaping(FirestoreCompletion) -> ()) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
         COLLECTION_POSTS.document(postId).getDocument { snapshot, err in
@@ -116,7 +116,7 @@ struct PostService {
         }
     }
     
-    static func unlikePost(postId: String, completion: @escaping(Error?) -> ()) {
+    static func unlikePost(postId: String, completion: @escaping(FirestoreCompletion) ) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
         COLLECTION_POSTS.document(postId).getDocument { snapshot, error in
@@ -139,7 +139,7 @@ struct PostService {
         }
     }
     
-    static func uploadComment(post: Post, comment: Comment, completion: @escaping(Error?) -> ()) {
+    static func uploadComment(post: Post, comment: Comment, completion: @escaping(FirestoreCompletion) ) {
         
         let uuid = UUID().uuidString
         let data: [String: Any] = ["text" : comment.text, "uid" : comment.uid, "username" : comment.username, "profileUrl" : comment.profileUrl, "timestamp" : Timestamp(date: comment.timeStamp)]

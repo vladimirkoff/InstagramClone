@@ -10,7 +10,7 @@ import FirebaseAuth
 import FirebaseDatabase
 import FirebaseFirestore
 
-struct AuthCreds {  // in order to minimize the amount of parameters in func
+struct AuthCreds {  
     let email: String
     let password: String
     let fullname: String

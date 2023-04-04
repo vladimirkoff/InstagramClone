@@ -11,7 +11,8 @@ import FirebaseAuth
 
 typealias FirestoreCompletion = (Error?) -> ()
 
-struct UserService {  // fetching user information
+struct UserService {
+    
     static func fetchUser(completion: @escaping(User) -> ()) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
@@ -25,8 +26,13 @@ struct UserService {  // fetching user information
             completion(user)
         }
     }
+    
     static func fetchUsers(completion:@escaping([User])->()){
         COLLECTION_USERS.getDocuments { snapshot, err in
+            if let error = err {
+                print("error fetching all users - \(error.localizedDescription)")
+                return
+            }
             guard let snapshot = snapshot else { return }
             
             let users = snapshot.documents.map({User(dictionary: $0.data())})  // loops through the list of users
@@ -39,12 +45,13 @@ struct UserService {  // fetching user information
         
         COLLECTION_FOLLOWING.document(currentUid).collection("user-following").document(uid).setData([:]) { err in
             if let error = err {
-                print(error)
+                print("Error following user - \(error.localizedDescription)")
                 return
             }
             COLLECTION_FOLLOWERS.document(uid).collection("user-followers").document(currentUid).setData([:], completion: completion)
         }
     }
+    
     static func unfollow(uid: String, completion: @escaping(FirestoreCompletion)) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
         
@@ -56,6 +63,7 @@ struct UserService {  // fetching user information
             COLLECTION_FOLLOWERS.document(uid).collection("user-followers").document(currentUid).delete(completion: completion
             )}
     }
+    
     static func checkIfFollowed(uid: String, completion: @escaping(Bool) -> ()) {
         guard let currentUid = Auth.auth().currentUser?.uid else { return }
         
@@ -78,6 +86,7 @@ struct UserService {  // fetching user information
             completion(num)
         }
     }
+    
     static func fetchUser(by uid: String, completion: @escaping(User) -> ()) {
         COLLECTION_USERS.document(uid).getDocument { snapshot, err in
             guard let dictionary: [String: Any] = snapshot?.data() else { return }
@@ -89,6 +98,7 @@ struct UserService {  // fetching user information
             completion(user)
         }
     }
+    
     static func getNumberOfPosts(with uid: String, completion: @escaping(Int) -> ()) {
         COLLECTION_USERS.document(uid).collection("user-posts").getDocuments { snapshot, error in
             guard let snapshot = snapshot else { return }
@@ -99,7 +109,7 @@ struct UserService {  // fetching user information
     static func updateUser(changedUser: User, completion: @escaping(String) -> ()) {
         print(changedUser.uid)
         COLLECTION_USERS.document(changedUser.uid).getDocument { snapshot, error in
-            if var user = snapshot?.reference {
+            if let user = snapshot?.reference {
                 self.updateUserInPosts(uid: changedUser.uid, username: changedUser.username, url: changedUser.profileImageUrl) { error in
                     user.updateData(["profileImageUrl" : changedUser.profileImageUrl])
                     user.updateData(["username" : changedUser.username])
@@ -116,7 +126,7 @@ struct UserService {  // fetching user information
             guard let docs = snapshot?.documents else { return }
             
             for doc in docs {
-                var user = doc.reference
+                let user = doc.reference
                 if doc.data()["ownerUid"] as? String ?? "" == uid {
                     user.updateData(["profileImage" : url])
                     user.updateData(["username" : username])
@@ -125,6 +135,5 @@ struct UserService {  // fetching user information
             completion("error")
         }
     }
-    
 }
 

@@ -10,7 +10,7 @@ import UIKit
 private let reuseIdentifier = "NotificationCell"
 
 class NotificationsController: UICollectionViewController {
-    //MARK: - Properies
+    //MARK: - Properties
     
     private var user: User
     
@@ -39,9 +39,6 @@ class NotificationsController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureUI()
-        fetchNotifications()
-        
     }
     
     //MARK: - API
@@ -64,10 +61,12 @@ class NotificationsController: UICollectionViewController {
     
     func configureUI() {
         view.backgroundColor = .white
-        navigationItem.title = "Comments"
+        navigationItem.title = "Notifications"
         collectionView.register(NotificationCell.self, forCellWithReuseIdentifier: reuseIdentifier)
     }
 }
+
+//MARK: - UICollectionViewDelegate & DataSoruce
 
 extension NotificationsController {
     
@@ -91,6 +90,8 @@ extension NotificationsController {
     }
 }
 
+//MARK: - NotificationCellDelegate
+
 extension NotificationsController: NotificationCellDelegate {
     func goToPost(cell: NotificationCell) {
         guard let postId = cell.viewModel?.notification.postId else { return }
@@ -101,7 +102,6 @@ extension NotificationsController: NotificationCellDelegate {
         }
         
     }
-    
     
     func checkIfFollowed(cell: NotificationCell, completion: @escaping (Bool) -> ()) {
         guard let uid = cell.viewModel?.notification.uid else { return }
@@ -146,6 +146,8 @@ extension NotificationsController: NotificationCellDelegate {
         }
     }
 }
+
+//MARK: - UICollectionViewDelegateFlowLayout
 
 extension NotificationsController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

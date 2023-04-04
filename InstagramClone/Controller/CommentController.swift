@@ -22,10 +22,9 @@ class CommentController: UICollectionViewController {
         return cv
     }()
     
-    
     var user: User?
     
-    var post: Post?
+    var post: Post
     
     private var commentUsers: [User]? {
         didSet { collectionView.reloadData()}
@@ -88,8 +87,6 @@ class CommentController: UICollectionViewController {
         self.tabBarController?.tabBar.isHidden = false
     }
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.register(CommentCell.self, forCellWithReuseIdentifier: reuseIdentifier)
@@ -115,7 +112,6 @@ class CommentController: UICollectionViewController {
     //MARK: - API
     
     func fetchComments() {
-        guard let post = post else { return }
         PostService.fetchComments(postId: post.postId) { comments in
             self.comments = comments
         }
@@ -162,10 +158,10 @@ extension CommentController: CommentTextViewDelegate {
         commentInputView.commentTextView.resignFirstResponder()
         
         let comment = Comment(text: text, uid: user.uid, username: user.username, profileUrl: user.profileImageUrl, timeStamp: Date())
-        PostService.uploadComment(post: post!, comment: comment) { error in
-            guard let uid = self.post?.uid else { return }
+        PostService.uploadComment(post: post, comment: comment) { error in
+            let uid = self.post.uid
             UserService.fetchUser(by: uid) { postUser in
-                NotificationService.commentedPost(user: self.user!, post: self.post!, comment: comment) { error in
+                NotificationService.commentedPost(user: self.user!, post: self.post, comment: comment) { error in
                     print("Success")
                     self.fetchComments()
                 }

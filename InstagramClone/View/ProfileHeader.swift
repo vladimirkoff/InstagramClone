@@ -127,11 +127,11 @@ class ProfileHeader: UICollectionReusableView {
         return button
     }()
     
-   lazy private var underline: UIView = {
+    private var underline: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .lightGray
-       
+        
         return view
     }()
     

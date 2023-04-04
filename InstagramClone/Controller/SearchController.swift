@@ -19,13 +19,11 @@ class SearchController: UITableViewController {
         return searchController.isActive && !searchController.searchBar.text!.isEmpty
     }
     
-    
     private let searchController = UISearchController(searchResultsController: nil)
     
     
     //MARK: - Lifecycle
    
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureTableView()
@@ -91,7 +89,6 @@ class SearchController: UITableViewController {
     extension SearchController: UISearchResultsUpdating {
         func updateSearchResults(for searchController: UISearchController) {
             guard let searchText = searchController.searchBar.text?.lowercased() else { return }
-            print(searchText)
             
             sortedUsers = users.filter({$0.username.lowercased().contains(searchText) || $0.fullName.lowercased().contains(searchText )})
             tableView.reloadData()

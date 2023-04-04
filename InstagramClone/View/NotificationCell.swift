@@ -75,6 +75,7 @@ class NotificationCell: UICollectionViewCell {
          iv.translatesAutoresizingMaskIntoConstraints = false
          iv.backgroundColor = .purple
          iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
         iv.isUserInteractionEnabled = true
          
          let gestureRecognizer = UITapGestureRecognizer()
@@ -82,6 +83,14 @@ class NotificationCell: UICollectionViewCell {
         iv.addGestureRecognizer(gestureRecognizer)
          
          return iv
+     }()
+    
+     private var underline: UIView = {
+         let view = UIView()
+         view.translatesAutoresizingMaskIntoConstraints = false
+         view.backgroundColor = .lightGray
+         view.backgroundColor = .lightGray
+         return view
      }()
     
     private lazy var followButton: UIButton = {
@@ -123,16 +132,16 @@ class NotificationCell: UICollectionViewCell {
         notificationLabel.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor).isActive = true
                 
         addSubview(followButton)
-        followButton.leftAnchor.constraint(equalTo: notificationLabel.rightAnchor, constant: 8).isActive = true
+        followButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -6).isActive = true
         followButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 16).isActive = true
         followButton.widthAnchor.constraint(equalToConstant: 75).isActive = true
         followButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
         
         addSubview(postImage)
-        postImage.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        postImage.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        postImage.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        postImage.heightAnchor.constraint(equalToConstant: 50).isActive = true
         postImage.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor).isActive = true
-        postImage.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8).isActive = true
+        postImage.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -12).isActive = true
         postImage.layer.cornerRadius = 5
         
         addSubview(commentLabel)
@@ -141,7 +150,10 @@ class NotificationCell: UICollectionViewCell {
         commentLabel.rightAnchor.constraint(equalTo: postImage.leftAnchor, constant: -4).isActive = true
         commentLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -2).isActive = true
         
-        
+        addSubview(underline)
+        underline.topAnchor.constraint(equalTo: commentLabel.bottomAnchor, constant: 4).isActive = true
+        underline.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        underline.widthAnchor.constraint(equalToConstant: self.frame.width).isActive = true
     }
     
     required init?(coder: NSCoder) {
