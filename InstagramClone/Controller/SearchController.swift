@@ -26,6 +26,13 @@ class SearchController: UITableViewController {
     //MARK: - Lifecycle
    
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        configureTableView()
+        fetchUsers()
+        configureSearchController()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white

@@ -7,159 +7,178 @@
 
 
 import UIKit
+import FirebaseAuth
 
-private let reuseIdentifier = "ActionSheetCell"
-
-protocol ActionSheetDelegate {
-    func didSelect(option: ActionSheetOptions)
+enum ActionType: String {
+    case delete = "Delete post"
+    case report = "Report post"
+    case save = "Save post"
+    case checkProfile = "Go to profile"
 }
 
-private let headerIdentifier = "ActionSheetHeader"
+protocol ActionSheetDelegate: class {
+    func goToProfile(user: User)
+}
+
+private let reuseIdentifier = "ActionCell"
 
 class ActionSheetLauncher: NSObject {
     
     //MARK: - Proeprties
     
-   
+    weak var delegate: ActionSheetDelegate?
+    
+    private let user: User
+    private let post: Post
     private let tableView = UITableView()
-    private var window: UIWindow?
-    private lazy var viewModel = ActionSheetViewModel()
-    var delegate: ActionSheetDelegate?
-    private var tableViewHeight: CGFloat?
+    
+    private lazy var cancelButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Cancel", for: .normal)
+        button.layer.cornerRadius = 12
+        button.tintColor = .black
+        button.backgroundColor = .systemGroupedBackground
+        button.addTarget(self, action: #selector(dismiss), for: .touchUpInside)
+        button.layer.borderColor = UIColor.white.cgColor
+        button.layer.borderWidth = 1
+        return button
+    }()
+    
+    private lazy var footerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.addSubview(cancelButton)
+        cancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12).isActive = true
+        cancelButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12).isActive = true
+        cancelButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        
+        return view
+    }()
     
     private lazy var blackView: UIView = {
         let view = UIView()
         view.alpha = 0
         view.backgroundColor = UIColor(white: 0, alpha: 0.5)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleDismissal))
+        let tap = UITapGestureRecognizer()
+        tap.addTarget(self, action: #selector(dismiss))
         view.addGestureRecognizer(tap)
         return view
     }()
     
-    private lazy var footerView: UIView = {
-        let view = UIView()
-        view.addSubview(cancelButton)
-        cancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12).isActive = true
-        cancelButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 12).isActive = true
-        cancelButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        cancelButton.layer.cornerRadius = 50/2
-        return view
-    }()
-    
-    private lazy var cancelButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Cancel", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.setTitleColor(.black, for: .normal)
-        button.backgroundColor = .systemGroupedBackground
-        button.addTarget(self, action: #selector(handleDismissal), for: .touchUpInside)
-        return button
-    }()
+    private var window: UIWindow?
     
     //MARK: - Lifecycle
     
-   
+    init(user: User, post: Post) {
+        self.user = user
+        self.post = post
+        super.init()
+    }
     
     //MARK: - Helpers
     
-    func showTableview(_ shouldShow: Bool) {
-        guard let window = window else { return }
-        guard let height = tableViewHeight else { return }
-        let y = shouldShow ? window.frame.height - height : window.frame.height
-        tableView.frame.origin.y = y
-    }
-    
-    
-    
-    func show(){
-        print("Show action sheet")
+    func show() {
+        configureTableView()
         
-        guard let window = UIApplication.shared.windows.first(where: {$0.isKeyWindow}) else { return }
+        guard let window = UIApplication.shared.windows.first(where: {$0.isKeyWindow }) else { return }
         self.window = window
         
         window.addSubview(blackView)
         blackView.frame = window.frame
         
         window.addSubview(tableView)
-        let height = CGFloat(3*60) + 100
-        self.tableViewHeight = height
-        tableView.frame = CGRect(x: 0, y: window.frame.height, width: window.frame.width, height: 300)
+        let height = CGFloat(3 * 60) + 100
+        tableView.frame = CGRect(x: 0 , y: window.frame.height, width: window.frame.width, height: height)
         
         UIView.animate(withDuration: 0.5) {
             self.blackView.alpha = 1
-            self.showTableview(true)
+            self.tableView.frame.origin.y -= height
         }
-        
     }
     
-//    func configureCollectionView() {
-//        var collectionView = UICollectionView()
-//
-//        collectionView.backgroundColor = .white
-//        collectionView.delegate = self
-//        collectionView.dataSource = self
-//        collectionView.rowHeight = 60
-//        collectionView.separatorStyle = .none
-//        collectionView.layer.cornerRadius = 5
-//        collectionView.isScrollEnabled = false
-//        collectionView.register(ActionSheetCell.self, forCellReuseIdentifier: reuseIdentifier)
-//    }
-//
-//    func configureTableview() {
-//
-//    }
-
+    func configureTableView() {
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .red
+        tableView.delegate = self
+        tableView.dataSource = self
+        
+        tableView.rowHeight = 60
+        tableView.separatorStyle = .none
+        tableView.isScrollEnabled = false
+        tableView.layer.cornerRadius = 5
+        
+        tableView.register(ActionSheetCell.self, forCellReuseIdentifier: reuseIdentifier)
+    }
     
     //MARK: - Selectors
     
-    @objc func handleDismissal() {
+    @objc func dismiss() {
         UIView.animate(withDuration: 0.5) {
             self.blackView.alpha = 0
             self.tableView.frame.origin.y += 300
         }
     }
-    
 }
 
-//MARK: - UITableViewDelegate and UITableViewDelegate
-
-extension ActionSheetLauncher: UITableViewDelegate, UITableViewDataSource  {
+extension ActionSheetLauncher: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 3
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! ActionSheetCell
-        cell.option = viewModel.options[indexPath.row]
+        if let uid = Auth.auth().currentUser?.uid {
+            if uid == user.uid {
+                let options: [ActionType] = [ .delete, .save, .checkProfile ]
+                cell.viewModel = ActionSheetViewModel(user: user, type: options[indexPath.row])
+            } else {
+                let options: [ActionType] = [ .report, .save, .checkProfile ]
+                cell.viewModel = ActionSheetViewModel(user: user, type: options[indexPath.row] )
+            }
+        }
+      
         return cell
     }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.options.count
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch indexPath.row {
+        case 0:
+            if self.user.uid == Auth.auth().currentUser?.uid {
+                PostService.deletePost(post: post, uid: user.uid)
+            } else {
+                print("Report")
+            }
+        case 1:
+            PostService.checkIfSaved(postId: post.postId) { isSaved in
+                if isSaved {
+                    PostService.removeFromSaved(postId: self.post.postId) { error in
+                        print("Unsaved")
+                    }
+                } else {
+                    PostService.addToSaved(caption: self.post.caption, uuid: self.post.postId) { error in
+                        print("Saved")
+                    }
+                }
+            }
+        case 2:
+            let uid = post.uid
+            UserService.fetchUser(by: uid) { user in
+                self.dismiss()
+                self.delegate?.goToProfile(user: user)
+            }
+        default:
+            print("Error")
+        }
     }
+    
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return footerView
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 60
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let option = viewModel.options[indexPath.row]
-        UIView.animate(withDuration: 0.5) {
-            self.blackView.alpha = 0
-            self.showTableview(false)
-        } completion: { _ in
-            self.delegate?.didSelect(option: option)
-        }
-
-        delegate?.didSelect(option: option)
+        return 100
     }
 }
-
-//extension ActionSheetLauncher {
-//    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-//
-//        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerIdentifier, for: indexPath) as! ActionSheetHeader
-//        return header
-//    }
-//}
-

@@ -47,7 +47,7 @@ struct PostService {
         }
     }
     
-    static func addToSaved(caption: String, image: UIImage, uuid: String, completion: @escaping(FirestoreCompletion)) {
+    static func addToSaved(caption: String, uuid: String, completion: @escaping(FirestoreCompletion)) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         COLLECTION_POSTS.document(uuid).getDocument { snapshot, err in
             guard let data = snapshot?.data() else { return }
@@ -95,7 +95,24 @@ struct PostService {
             data["likes"] = likes
             COLLECTION_POSTS.document(postId).updateData(["likes": likes])
             COLLECTION_POSTS.document(postId).collection("post-likes").document(uid).setData(["userId" : uid])
-            COLLECTION_USERS.document(uid).collection("user-likes").document(postId).setData(data, completion: completion)
+            COLLECTION_USERS.document(uid).collection("user-likes").document(postId).setData(data)
+            COLLECTION_USERS.getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error - \(error.localizedDescription)")
+                    return
+                }
+                guard let users = snapshot?.documents else { return }
+                for user in users {
+                     let posts = user.reference.collection("user-saved").getDocuments(completion: { snapshot, error in
+                        guard let posts = snapshot?.documents else { return }
+                        for post in posts {
+                            if post.documentID == postId {
+                                post.reference.updateData(["likes" : likes])
+                            }
+                        }
+                    })
+                }
+            }
         }
     }
     
@@ -168,6 +185,25 @@ struct PostService {
             let posts = [Post(dictionary: doc)]
             completion(posts)
         }
+    }
+    
+    static func deletePost(post: Post, uid: String) {
+        COLLECTION_POSTS.document(post.postId).delete()
+        COLLECTION_USERS.document(uid).collection("user-posts").document(post.postId).delete(completion: { error in
+            COLLECTION_USERS.getDocuments { snapshot, error in
+                guard let docs = snapshot?.documents else  { return }
+                for doc in docs {
+                    doc.reference.collection("user-saved").getDocuments { snapshot, error in
+                        guard let documents = snapshot?.documents else { return }
+                        for doc in documents {
+                            if doc.data()["postId"] as! String == post.postId {
+                                doc.reference.delete()
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
     
 }

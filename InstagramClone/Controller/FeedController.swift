@@ -11,24 +11,83 @@ import SDWebImage
 
 private let reuseIdentifier = "Cell"
 
-class FeedController: UICollectionViewController, ActionSheetDelegate {
-    func didSelect(option: ActionSheetOptions) {
-        print("Tapped")
-    }
+enum PostsType {
+    case feed
+    case profile
+    case saved
+    case single
+}
+
+class FeedController: UICollectionViewController {
     
-    private var user: User?
+    //MARK: - Properties
     
-    var customPosts: [Post]? {
-        didSet {
-            
-        }
-    }
+    private var user: User
     
-    private var actionSheet: ActionSheetLauncher!
+    var post: [Post]?
+    
+    let postsType: PostsType
+    
+    private var actionSheet: ActionSheetLauncher?
         
     private var posts: [Post]? {
         didSet {
             collectionView.reloadData()
+        }
+    }
+    
+
+    
+    //MARK: - Lifecycle
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+
+        switch postsType {
+            
+        case .feed:
+            fetchPosts()
+        case .profile:
+            fetchPostsForUser(withUid: user.uid)
+        case .saved:
+            fetchSavedPosts()
+        case .single:
+            self.posts = self.post
+        }
+    }
+    
+    init(user: User, postsType: PostsType) {
+        self.user = user
+        self.postsType = postsType
+        super.init(collectionViewLayout: UICollectionViewFlowLayout())
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureUI()
+    }
+    
+    //MARK: - Helpers
+    
+    func configureUI() {
+        collectionView.register(PostCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Log out", style: .plain, target: self, action: #selector(logOut))
+        navigationItem.title = "Instagram"
+        
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        collectionView.refreshControl = refreshControl
+    }
+    //MARK: - API
+    
+    func fetchUser(uid: String, completion: @escaping(User) -> ()) {
+        UserService.fetchUser(by: uid) { user in
+            completion(user)
         }
     }
     
@@ -42,40 +101,15 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
         })
     }
     
-    //MARK: - Lifecycle
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
-
-        if customPosts == nil {
-            fetchCurrentUser()
-            fetchPosts()
-            return
+    func checkIfLiked() {
+        self.posts!.forEach { post in
+            PostService.checkIfLiked(postId: post.postId) { isLiked in
+                if let index = self.posts?.firstIndex(where: {$0.postId == post.postId}) {
+                    self.posts![index].isLiked = isLiked
+                }
+            }
         }
-        fetchCurrentUser()
     }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-//        fetchCurrentUser()
-//        fetchPosts()
-        configureUI()
-    }
-    
-    //MARK: - Helpers
-    
-    func configureUI() {
-        fetchPosts()
-        collectionView.register(PostCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Log out", style: .plain, target: self, action: #selector(logOut))
-        navigationItem.title = "Instagram"
-        
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
-        collectionView.refreshControl = refreshControl
-    }
-    //MARK: - API
     
     func fetchPosts() {
         PostService.fetchPosts { [weak self] posts in
@@ -85,48 +119,37 @@ class FeedController: UICollectionViewController, ActionSheetDelegate {
         }
     }
     
-    func checkIfLiked() {
-        self.posts!.forEach { post in
-            PostService.checkIfLiked(postId: post.postId) { isLiked in
-                if let index = self.posts?.firstIndex(where: {$0.postId == post.postId}) {
-                    self.posts![index].isLiked = isLiked
-                }
-            }
-        }
-        
-    }
-    
-    func fetchCurrentUser() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        UserService.fetchUser(by: uid) { user in
-            self.user = user
+    func fetchPostsForUser(withUid uid: String) {
+        PostService.fetchPostsForUser(with: uid) { posts in
+            self.posts = posts
+            self.checkIfLiked()
+            self.checkIfSaved()
         }
     }
     
-    func fetchUser(uid: String, completion: @escaping(User) -> ()) {
-        UserService.fetchUser(by: uid) { user in
-            completion(user)
+    func fetchSavedPosts() {
+        PostService.fetchSavedPosts { posts in
+            self.posts = posts
+            self.checkIfLiked()
+            self.checkIfSaved()
         }
     }
+    
 }
 
 
-
 //MARK: - UICollectionViewDataSource
+
 extension FeedController {
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return customPosts == nil ? posts?.count ?? 0 : customPosts?.count ?? 0
+        return posts?.count ?? 0
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PostCell
         cell.delegate = self
-        if var post = posts?[indexPath.row] {
-            cell.viewModel = PostViewModel(post: post)
-        }
-        
-        if var post = customPosts?[indexPath.row] {
+        if let post = posts?[indexPath.row] {
             cell.viewModel = PostViewModel(post: post)
         }
         return cell
@@ -147,7 +170,18 @@ extension FeedController {
     }
     
     @objc func handleRefresh() {
-        fetchPosts()
+        switch postsType {
+        case .feed:
+            fetchPosts()
+            return
+        case .profile:
+            fetchPostsForUser(withUid: user.uid)
+        case .saved:
+            fetchSavedPosts()
+        case .single:
+            self.posts = self.post
+
+        }
         self.collectionView.refreshControl?.endRefreshing()
     }
 }
@@ -163,15 +197,14 @@ extension FeedController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+//MARK: - PostCellDelegate
+
 extension FeedController: PostCellDelegate {
     
     func shareTapped(post: Post) {
         
     }
-    
-   
-    
- 
+
     func commentTapped(post: Post) {
         let vc = CommentController(post: post)
         navigationController?.pushViewController(vc, animated: true)
@@ -183,38 +216,36 @@ extension FeedController: PostCellDelegate {
                 cell.likeButton.setImage(UIImage(named: "like_unselected"), for: .normal)
                 PostService.unlikePost(postId: post.postId) { error in
                     completion(error, .unliked)
-                    NotificationService.postUnliked(user: self.user!, post: post) { error in
+                    NotificationService.postUnliked(user: self.user, post: post) { error in
                         
                     }
                 }
             } else {
                 cell.likeButton.setImage(UIImage(named: "like_selected"), for: .normal)
                 UserService.fetchUser(by: post.uid) { user in
-                    NotificationService.postLiked(user: self.user!, post: post) { error in
+                    NotificationService.postLiked(user: self.user, post: post) { error in
                         PostService.likePost(postId: post.postId ) { err in
                             completion(error, .liked)
                         }
                     }
                 }
-                
             }
         }
     }
     
     func usernameTapped(cell: PostCell) {
         guard let uid = cell.viewModel?.post.uid else { return }
-//        guard let ownUid = Auth.auth().currentUser?.uid else { return }
         fetchUser(uid: uid ) { [weak self] user in
                 let vc = ProfileController(user: user)
                 self?.navigationController?.pushViewController(vc, animated: true)
         }
     }
     
-    func showOptions() {
-        if true {
-            actionSheet = ActionSheetLauncher()
-            self.actionSheet.delegate = self
-            actionSheet.show()
+    func showOptions(cell: PostCell) {
+        UserService.fetchUser(by: cell.viewModel!.post.uid) { user in
+            self.actionSheet = ActionSheetLauncher(user: user, post: cell.viewModel!.post)
+            self.actionSheet?.delegate = self
+            self.actionSheet!.show()
         }
     }
     
@@ -226,10 +257,19 @@ extension FeedController: PostCellDelegate {
                     print("Unsaved")
                 }
             } else {
-                PostService.addToSaved(caption: caption, image: image, uuid: uuid) { error in
+                PostService.addToSaved(caption: caption, uuid: uuid) { error in
                     print("Saved")
                 }
             }
         }
+    }
+}
+
+//MARK: - ActionSheetDelegate
+
+extension FeedController: ActionSheetDelegate {
+    func goToProfile(user: User) {
+        let vc = ProfileController(user: user)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

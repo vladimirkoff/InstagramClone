@@ -64,7 +64,6 @@ class SavedController: UICollectionViewController {
         navigationItem.title = "Saved posts"
         navigationController?.navigationBar.backgroundColor = .red
         view.backgroundColor = .purple
-        self.tabBarController?.tabBar.isHidden = false
     
         
         collectionView.backgroundColor = .white
@@ -98,8 +97,7 @@ extension SavedController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
-        vc.profile = false
+        let vc = FeedController(user: user, postsType: .saved)
         navigationController?.pushViewController(vc, animated: true)
     }
     

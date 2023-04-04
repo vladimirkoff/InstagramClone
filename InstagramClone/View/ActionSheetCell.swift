@@ -10,10 +10,8 @@ import UIKit
 class ActionSheetCell: UITableViewCell {
     //MARK: - Properties
     
-    var option: ActionSheetOptions? {
-        didSet {
-            configure()
-        }
+    var viewModel: ActionSheetViewModel? {
+        didSet { configure() }
     }
     
     private let optionImageView: UIImageView = {
@@ -21,7 +19,8 @@ class ActionSheetCell: UITableViewCell {
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
-        iv.image = UIImage(named: "save")
+        iv.image = UIImage(systemName: "trash.fill")
+        iv.tintColor = .red
         return iv
     }()
     
@@ -40,20 +39,25 @@ class ActionSheetCell: UITableViewCell {
         addSubview(optionImageView)
         optionImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         optionImageView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
-        optionImageView.heightAnchor.constraint(equalToConstant: 36).isActive = true
-        optionImageView.widthAnchor.constraint(equalToConstant: 36).isActive = true
+        optionImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        optionImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
+
         addSubview(titleLabel)
+        titleLabel.leftAnchor.constraint(equalTo: optionImageView.rightAnchor, constant: 8).isActive = true
         titleLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
-        titleLabel.leftAnchor.constraint(equalTo: optionImageView.rightAnchor, constant: 12).isActive = true
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK: - Heleprs
-    
     func configure() {
-        titleLabel.text = option?.description
+        guard let viewModel = viewModel else { return }
+        
+        titleLabel.text = viewModel.title
+        optionImageView.image = viewModel.image
     }
+    
+    
+    
 }

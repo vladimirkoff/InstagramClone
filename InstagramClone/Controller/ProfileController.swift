@@ -124,11 +124,9 @@ extension ProfileController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
-        vc.profile = true
+        let vc = FeedController(user: self.user, postsType: .profile)
         vc.navigationController?.navigationBar.barStyle = .default
        
-
         navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -164,22 +162,18 @@ extension ProfileController: ProfileHeaderDelegate {
     func profileActionTapped(action: ProfileActions) {
         switch action {
         case .list:
-            let vc = ProfileFeedController(collectionViewLayout: UICollectionViewFlowLayout())
-            vc.profile = true
+            let vc = FeedController(user: self.user, postsType: .profile)
             vc.navigationController?.navigationBar.barStyle = .default
            
-
             navigationController?.pushViewController(vc, animated: true)
+
         case .posts:
             let vc = ProfileController(user: user)
             navigationController?.pushViewController(vc, animated: true)
         case .saved:
             let vc = SavedController(user: user)
-                        
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .fullScreen
-            
-            present(nav, animated: true, completion: nil)
+            vc.navigationController?.navigationBar.isHidden = false
+            navigationController?.pushViewController(vc, animated: true)
         }
     }
     

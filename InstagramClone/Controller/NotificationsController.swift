@@ -95,8 +95,8 @@ extension NotificationsController: NotificationCellDelegate {
     func goToPost(cell: NotificationCell) {
         guard let postId = cell.viewModel?.notification.postId else { return }
         PostService.fetchPost(postId: postId) { posts in
-            let vc = FeedController(collectionViewLayout: UICollectionViewFlowLayout())
-            vc.customPosts = posts
+            let vc = FeedController(user: self.user, postsType: .single)
+            vc.post = posts
             self.navigationController?.pushViewController(vc, animated: true)
         }
         

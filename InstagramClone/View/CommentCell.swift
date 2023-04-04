@@ -15,6 +15,7 @@ protocol CommentCellDelegate: class {
 class CommentCell: UICollectionViewCell {
     //MARK: - Properties
     
+    
     weak var delegate: CommentCellDelegate?
     
     var viewModel: CommentViewModel? {

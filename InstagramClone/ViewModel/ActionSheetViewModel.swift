@@ -5,40 +5,30 @@
 //  Created by Vladimir Kovalev on 27.03.2023.
 //
 
-import Foundation
+import UIKit
 
 struct ActionSheetViewModel {
     
-     var options: [ActionSheetOptions] {
-        var results = [ActionSheetOptions]()
-        if true {
-            results.append(.delete)
-        } else {
-            let followOption: ActionSheetOptions = .follow
-            results.append(followOption)
-        }
-         results.append(.report)
-        return results
+    let user: User
+    
+    let type: ActionType
+    
+    var title: String {
+        return type.rawValue
     }
     
-}
-
-enum ActionSheetOptions {
-    case follow
-    case unfollow
-    case report
-    case delete
-    
-    var description: String {
-        switch self {
-        case .follow:
-            return "Follow @"
-        case .unfollow:
-            return "Unfollow "
-        case .report:
-            return "Report tweet"
+    var image: UIImage {
+        switch type {
+            
         case .delete:
-            return "Delete tweet"
+            return UIImage(systemName: "trash")!
+        case .report:
+            return UIImage(systemName: "externaldrive.fill.trianglebadge.exclamationmark")!
+        case .save:
+            return UIImage(named: "ribbon")!
+        case .checkProfile:
+            return UIImage(named: "profile_selected")!
         }
     }
+    
 }

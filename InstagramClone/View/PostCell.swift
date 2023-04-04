@@ -8,9 +8,9 @@
 import UIKit
 import SDWebImage
 
-protocol PostCellDelegate: class {
-    func showOptions()
-    func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ())  // saving post
+protocol PostCellDelegate: AnyObject {
+    func showOptions(cell: PostCell)
+    func savePost(caption: String, image: UIImage, uuid: String, completion: @escaping(Bool) -> ())
     func usernameTapped(cell: PostCell)
     func likeTapped(post: Post, cell: PostCell, completion: @escaping(Error?, LikedUnliked) -> ())
     func commentTapped(post: Post)
@@ -27,27 +27,23 @@ class PostCell: UICollectionViewCell {
     //MARK: - Properties
     
     var viewModel: PostViewModel? {
-        didSet {
-            configure()
-        }
+        didSet { configure() }
     }
-    
-    
     
     weak var delegate: PostCellDelegate?
     
-    
-    var profileImage: UIImageView = {
+    private lazy var profileImage: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.backgroundColor = .systemPurple
+        iv.backgroundColor = .lightGray
         iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(configureGestureRec())
         return iv
     }()
     
-     lazy var usernameButton: UIButton = {
+    private lazy var usernameButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitleColor(.black, for: .normal)
@@ -56,7 +52,7 @@ class PostCell: UICollectionViewCell {
         return button
     }()
     
-     var postImage: UIImageView = {
+    private let postImage: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill
@@ -101,7 +97,7 @@ class PostCell: UICollectionViewCell {
         return label
     }()
     
-     var captionLabel: UILabel = {
+    private let captionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 14)
@@ -116,38 +112,35 @@ class PostCell: UICollectionViewCell {
         return label
     }()
     
-    var usernameLabel: UILabel = {
-       let label = UILabel()
-       label.translatesAutoresizingMaskIntoConstraints = false
-       label.font = UIFont.boldSystemFont(ofSize: 14)
-       return label
-   }()
-
-    lazy private var optionsButton: UIButton = {
+    private let usernameLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.boldSystemFont(ofSize: 14)
+        return label
+    }()
+    
+    private lazy var optionsButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "dots"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(optionsButtonPressed), for: .touchUpInside)
-        button.frame = CGRect(x: 0, y: 0, width: 10, height: 2)
         return button
     }()
     
-    lazy var saveButton: UIButton = {
+    private lazy var saveButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(named: "ribbon"), for: .normal)
         button.tintColor = .black
         button.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
         return button
     }()
-        
+    
     //MARK: - Lifecycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .white
-      
-        
+
         addSubview(profileImage)
         profileImage.topAnchor.constraint(equalTo: self.topAnchor, constant: 12).isActive = true
         profileImage.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 12).isActive = true
@@ -158,7 +151,7 @@ class PostCell: UICollectionViewCell {
         addSubview(usernameButton)
         usernameButton.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor).isActive = true
         usernameButton.leftAnchor.constraint(equalTo: profileImage.rightAnchor, constant: 8).isActive
-         = true
+        = true
         
         addSubview(postImage)
         postImage.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: 8).isActive = true
@@ -183,7 +176,7 @@ class PostCell: UICollectionViewCell {
         addSubview(usernameLabel)
         usernameLabel.topAnchor.constraint(equalTo: likesLabel.bottomAnchor, constant: 8).isActive = true
         usernameLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
-
+        
         addSubview(captionLabel)
         captionLabel.topAnchor.constraint(equalTo: likesLabel.bottomAnchor, constant: 8).isActive = true
         captionLabel.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor, constant: 4).isActive = true
@@ -202,10 +195,7 @@ class PostCell: UICollectionViewCell {
         addSubview(saveButton)
         saveButton.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -12).isActive = true
         saveButton.topAnchor.constraint(equalTo: postImage.bottomAnchor, constant: 12).isActive = true
-        
-        let gestureRecognizer = UITapGestureRecognizer()
-        gestureRecognizer.addTarget(self, action: #selector(didTapUsername))
-        profileImage.addGestureRecognizer(gestureRecognizer)
+    
     }
     
     
@@ -233,7 +223,7 @@ class PostCell: UICollectionViewCell {
     @objc func didTapLike() {
         guard let post = viewModel?.post else { return }
         delegate?.likeTapped(post: post, cell: self) { error, like in
-            var currentLikes = Int(self.likesLabel.text!.prefix(1))!
+            guard let currentLikes = Int(self.likesLabel.text!.prefix(1)) else { return }
             switch like {
             case .liked:
                 self.likesLabel.text = "\(currentLikes + 1) likes"
@@ -246,8 +236,8 @@ class PostCell: UICollectionViewCell {
     }
     
     @objc func saveTapped() {
-        delegate?.savePost(caption: self.captionLabel.text!, image: self.postImage.image!, uuid: viewModel!.post.postId, completion: { isSaved in
-            print(isSaved)
+        guard let viewModel = viewModel else { return }
+        delegate?.savePost(caption: self.captionLabel.text!, image: self.postImage.image!, uuid: viewModel.post.postId, completion: { isSaved in
             let image = isSaved ? "ribbon" : "ribbon_filled"
             self.saveButton.setImage(UIImage(named: image), for: .normal)
         })
@@ -255,13 +245,14 @@ class PostCell: UICollectionViewCell {
     
     
     @objc func optionsButtonPressed() {
-        delegate?.showOptions()
+        delegate?.showOptions(cell: self)
     }
     
     //MARK: - Helpers
     
     func configure() {
         guard let viewModel = viewModel else { return }
+        
         captionLabel.text = viewModel.caption
         profileImage.sd_setImage(with: URL(string: viewModel.post.profileImage))
         postImage.sd_setImage(with: URL(string: viewModel.post.imageUrl))
@@ -277,7 +268,12 @@ class PostCell: UICollectionViewCell {
         saveButton.setImage(UIImage(named: saveImage), for: .normal)
     }
     
-   
+    func configureGestureRec() -> UITapGestureRecognizer {
+        let gestureRecognizer = UITapGestureRecognizer()
+        gestureRecognizer.addTarget(self, action: #selector(didTapUsername))
+        return gestureRecognizer
+    }
+    
 }
 
 
