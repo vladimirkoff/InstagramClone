@@ -17,7 +17,6 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
     
     private let hud = JGProgressHUD(style: .dark)
     
-    
     var infoChanged: Bool? {
         didSet {
             navigationItem.rightBarButtonItem?.isEnabled = true

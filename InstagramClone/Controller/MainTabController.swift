@@ -19,7 +19,18 @@ class MainTabController: UITabBarController {
         }
     }
     
+    var scene: UIWindowScene
+    
     //MARK: - Lifecycle
+    
+    init(scene: UIWindowScene) {
+        self.scene = scene
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -36,10 +47,12 @@ class MainTabController: UITabBarController {
     //MARK: - API
     
     func checkIfLoggedIn() {
+        print(scene)
         if Auth.auth().currentUser == nil {
             DispatchQueue.main.async {
-                let controller = LoginController()
+                let controller = LoginController(scene: self.scene)
                 controller.delegate = self
+                controller.scene = self.scene
                 let nav = UINavigationController(rootViewController: controller)
                 nav.modalPresentationStyle = .fullScreen
                 self.present(nav, animated: true, completion: nil)
@@ -58,7 +71,8 @@ class MainTabController: UITabBarController {
     func configureVC(with user: User) {
         self.delegate = self
         
-        let feed = templateNavController(unselectedImage: UIImage(named: "home_unselected")!, selectedImage: UIImage(named: "home_selected")!, rootVC: FeedController(user: user, postsType: .feed))
+        let feedVC = FeedController(user: user, postsType: .feed, scene: self.scene)
+        let feed = templateNavController(unselectedImage: UIImage(named: "home_unselected")!, selectedImage: UIImage(named: "home_selected")!, rootVC: feedVC)
         let search = templateNavController(unselectedImage: UIImage(named: "search_unselected")!, selectedImage: UIImage(named: "search_selected")!, rootVC: SearchController())
         let post = templateNavController(unselectedImage: UIImage(named: "plus_unselected")!, selectedImage: UIImage(named: "plus_unselected")!, rootVC: PostController())
         let profile = ProfileController(user: user)

@@ -94,7 +94,7 @@ extension SavedController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let vc = FeedController(user: user, postsType: .saved)
+        let vc = FeedController(user: user, postsType: .saved, scene: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     

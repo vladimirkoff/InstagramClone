@@ -26,6 +26,8 @@ class FeedController: UICollectionViewController {
     
     var post: [Post]?
     
+    var scene: UIWindowScene?
+    
    private var activityVC: UIActivityViewController? = nil
     
     let postsType: PostsType
@@ -58,9 +60,10 @@ class FeedController: UICollectionViewController {
         }
     }
     
-    init(user: User, postsType: PostsType) {
+    init(user: User, postsType: PostsType, scene: UIWindowScene?) {
         self.user = user
         self.postsType = postsType
+        self.scene = scene
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
     
@@ -167,7 +170,7 @@ extension FeedController {
     @objc func logOut() {
         do {
             try Auth.auth().signOut()
-            let controller = LoginController()
+            let controller = LoginController(scene: self.scene!)
             let nav = UINavigationController(rootViewController: controller)
             nav.modalPresentationStyle = .fullScreen
             self.present(nav, animated: true)
@@ -223,7 +226,6 @@ extension FeedController: PostCellDelegate {
                 PostService.unlikePost(post: post) { error in
                     completion(error, .unliked)
                     NotificationService.postUnliked(user: self.user, post: post) { error in
-                        
                     }
                 }
             }

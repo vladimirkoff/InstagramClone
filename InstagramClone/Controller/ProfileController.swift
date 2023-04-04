@@ -14,7 +14,7 @@ private let headerIdentifier = "ProfileHeader"
 class ProfileController: UICollectionViewController {
     //MARK: - Properties
     
-
+    private var currentUserUid: String?
     private var user: User
     private var posts: [Post]?
     private var viewModel: PostViewModel?
@@ -32,6 +32,8 @@ class ProfileController: UICollectionViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        currentUserUid = Auth.auth().currentUser?.uid
         configureUI()
         fetchPosts(uid: user.uid)
         fetchUser()
@@ -120,10 +122,10 @@ extension ProfileController {
         return posts?.count ?? 0
     }
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerIdentifier, for: indexPath) as! ProfileHeader
             header.viewModel = ProfileHeaderViewModel(user: user)
         header.delegate = self
+        header.currentUserUid = currentUserUid
         header.numberOfFollowing = user.numberOfFollowing
         header.numberOfFollowers = user.numberOfFollowers
         header.numberOfPosts = user.numberOfPosts
@@ -131,7 +133,7 @@ extension ProfileController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let vc = FeedController(user: self.user, postsType: .profile)
+        let vc = FeedController(user: self.user, postsType: .profile, scene: nil)
         vc.navigationController?.navigationBar.barStyle = .default
        
         navigationController?.pushViewController(vc, animated: true)
@@ -169,7 +171,7 @@ extension ProfileController: ProfileHeaderDelegate {
     func profileActionTapped(action: ProfileActions) {
         switch action {
         case .list:
-            let vc = FeedController(user: self.user, postsType: .profile)
+            let vc = FeedController(user: self.user, postsType: .profile, scene: nil)
             vc.navigationController?.navigationBar.barStyle = .default
            
             navigationController?.pushViewController(vc, animated: true)

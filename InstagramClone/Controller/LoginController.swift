@@ -22,6 +22,10 @@ class LoginController: UIViewController, FormViewModel {
     
     //MARK: - Proeprties
     
+    var window: UIWindow?
+    
+    var scene: UIWindowScene
+    
     weak var delegate: AuthDelegate?  // avoiding retain cycle
     
     private var viewModel = LoginViewModel()
@@ -70,6 +74,16 @@ class LoginController: UIViewController, FormViewModel {
     
     
     //MARK: - Lifecycle
+    
+    init(scene: UIWindowScene) {
+        self.scene = scene
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -111,7 +125,7 @@ class LoginController: UIViewController, FormViewModel {
     //MARK: - Selectors
     
     @objc func goToSignup() {
-        let vc = SignupController()
+        let vc = SignupController(scene: self.scene)
         vc.delegate = delegate
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -134,8 +148,18 @@ class LoginController: UIViewController, FormViewModel {
                 return
             }
             self.delegate?.authComplete()
-            let vc = MainTabController()
-            self.navigationController?.pushViewController(vc, animated: true)
+            
+            self.window = UIWindow(windowScene: self.scene)
+            
+            let nav = UINavigationController(rootViewController: MainTabController(scene: self.scene))
+            nav.navigationBar.isHidden = true
+            self.window?.rootViewController = nav
+            self.window?.makeKeyAndVisible()
+            
+            
+//            let nav = UINavigationController(rootViewController: MainTabController())
+//            nav.navigationBar.isHidden = true
+//            self.navigationController?.pushViewController(nav, animated: true)
         }
     }
 }

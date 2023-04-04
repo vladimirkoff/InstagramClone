@@ -84,10 +84,11 @@ struct PostService {
         COLLECTION_USERS.document(uid).collection("user-saved").document(postId).delete(completion: completion)
     }
     
-    static func likePost(post: Post, completion:@escaping(FirestoreCompletion) -> ()) {
+    static func likePost(post: Post, completion:@escaping(FirestoreCompletion)) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
         COLLECTION_POSTS.document(post.postId).getDocument { snapshot, err in
+
             guard let snapshot = snapshot?.data() else { return }
             var data = snapshot
             var likes = snapshot["likes"] as! Int
@@ -95,8 +96,31 @@ struct PostService {
             data["likes"] = likes
             COLLECTION_POSTS.document(post.postId).updateData(["likes": likes])
             COLLECTION_POSTS.document(post.postId).collection("post-likes").document(uid).setData(["userId" : uid])
-            COLLECTION_USERS.document(uid).collection("user-likes").document(post.postId).updateData(["likes"  : likes])
+            COLLECTION_USERS.document(uid).collection("user-likes").document(post.postId).setData(data)
             COLLECTION_USERS.document(post.uid).collection("user-posts").document(post.postId).updateData(["likes" : likes])
+            
+            updateSavedPost(likes: likes, post: post) { error in
+                completion(error)
+            }
+        }
+    }
+    
+    static func updateSavedPost(likes: Int, post: Post, completion: @escaping(FirestoreCompletion)) {
+        COLLECTION_USERS.getDocuments { snapshot, error in
+            guard let users = snapshot?.documents else { return }
+            
+            for user in users {
+                user.reference.collection("user-saved").getDocuments { snapshot, error in
+                    guard let posts = snapshot?.documents else { return }
+                    
+                    for savedPost in posts {
+                        if savedPost.documentID == post.postId {
+                            savedPost.reference.updateData(["likes" : likes])
+                        }
+                    }
+                }
+            }
+            completion(error)
         }
     }
     

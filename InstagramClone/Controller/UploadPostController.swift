@@ -69,6 +69,7 @@ class UploadPostController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        navigationController?.navigationBar.isHidden = false
         configureUI()
         postImage.image = UIImage(data: imageData!)
     }
@@ -136,6 +137,7 @@ class UploadPostController: UIViewController {
                 print("ERROR uploadding post = \(error.localizedDescription)")
                 return
             }
+            self?.navigationController?.navigationBar.isHidden = true
             self?.navigationController?.popViewController(animated: true)
         }
     }

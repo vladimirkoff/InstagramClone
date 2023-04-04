@@ -16,6 +16,10 @@ class SignupController: UIViewController, FormViewModel {
     
     var viewModel = RegistrationViewModel()
     
+    var scene: UIWindowScene
+    
+    var window: UIWindow?
+    
     private let plusButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -71,6 +75,15 @@ class SignupController: UIViewController, FormViewModel {
     }()
     
     //MARK: - Lifecycle
+    init(scene: UIWindowScene) {
+        self.scene = scene
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -130,8 +143,13 @@ class SignupController: UIViewController, FormViewModel {
                 print(error.localizedDescription)
             }
             self.delegate?.authComplete()
-            let vc = MainTabController()
-            self.navigationController?.pushViewController(vc, animated: true)
+            
+            self.window = UIWindow(windowScene: self.scene)
+            
+            let nav = UINavigationController(rootViewController: MainTabController(scene: self.scene))
+            nav.navigationBar.isHidden = true
+            self.window?.rootViewController = nav
+            self.window?.makeKeyAndVisible()
         }
     }
     
@@ -148,7 +166,6 @@ class SignupController: UIViewController, FormViewModel {
     
     
     @objc func textDidChange(sender: UITextField) {
-        print("sender")
         if sender == emailField {
             viewModel.email = sender.text
         } else if sender == passwordField {

@@ -7,6 +7,7 @@
 
 import UIKit
 import SDWebImage
+import FirebaseAuth
 
 enum ProfileActions {
     case list
@@ -21,6 +22,8 @@ protocol ProfileHeaderDelegate: AnyObject {
 
 class ProfileHeader: UICollectionReusableView {
     //MARK: - Properties
+    
+    var currentUserUid: String?
     
     var viewModel: ProfileHeaderViewModel? {
         didSet {
@@ -114,7 +117,7 @@ class ProfileHeader: UICollectionReusableView {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "ribbon"), for: .normal)
         button.tintColor = .black
-        button.addTarget(self, action: #selector(savedTapped), for: .touchUpInside)
+
         return button
     }()
     
@@ -213,6 +216,15 @@ class ProfileHeader: UICollectionReusableView {
         followersLabel.attributedText = attributedLabel(value: numberOfFollowers ?? 0, label: "Followers")
         followingLabel.attributedText = attributedLabel(value: numberOfFollowing ?? 0, label: "Following")
         postsLabel.attributedText = attributedLabel(value: numberOfPosts ?? 0, label: "Posts")
+        
+        if let currentUserUid = currentUserUid {
+            if currentUserUid != viewModel.user.uid {
+                savedButton.setImage(UIImage(named: "comment"), for: .normal)
+            } else {
+                savedButton.addTarget(self, action: #selector(savedTapped), for: .touchUpInside)
+            }
+        }
+        
     }
     
     //MARK: - Selectors
