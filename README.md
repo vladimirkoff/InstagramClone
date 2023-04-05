@@ -1,4 +1,4 @@
-# InsragramClone
+# InstagramClone
 
 ### UIKit Instagram Clone app for iOS/iPadOS built with Firebase
 
