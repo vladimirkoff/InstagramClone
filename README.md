@@ -19,7 +19,7 @@ git clone https://github.com/vladimirkoff/InstagramClone.git
 
 3. Select some iOS/iPadOS device and hit run button in Xcode
 
-> **Note**: Minimal supported iOS/iPadOS version is 14.0
+> **Note**: Minimal supported iOS/iPadOS version is 15.0
 
 # Log in your account
 
