@@ -25,5 +25,7 @@
 
 # Manage your posts
 
-![Simulator Screen Shot - iPhone 14 Pro - 2023-04-04 at 19 20 10](https://user-images.githubusercontent.com/115025494/230006536-97e58371-53a4-462b-97fd-9d794bf13742.png)
+![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 10 09 48](https://user-images.githubusercontent.com/115025494/230006987-66176aae-7ae4-4a1a-82d0-e5dacc4c29a2.png)
+
+
 
