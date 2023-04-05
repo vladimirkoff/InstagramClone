@@ -21,13 +21,13 @@ git clone https://github.com/vladimirkoff/InstagramClone.git
 
 > **Note**: Minimal supported iOS/iPadOS version is 15.0
 
-# Use
+# Usage
 
 ### Group schedule
 
-| Two-week schedule  | Detailed info | Change group |
-| ------------- | ------------- | ------------- |
-| ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 18 55](https://user-images.githubusercontent.com/64316080/174355497-c28cb3e1-944e-4e2d-83ee-de7f6f79a659.png) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 19 03](https://user-images.githubusercontent.com/64316080/174355522-92c5756f-6f77-4ea5-be61-8a11903f3a21.png) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 19 15](https://user-images.githubusercontent.com/64316080/174355543-bbd5251c-397b-4fbe-99c8-7f4c8e32bd52.png) |
+| Log in  | Sign up|
+| ------------- | ------------- | 
+| ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 18 55](https://user-images.githubusercontent.com/64316080/174355497-c28cb3e1-944e-4e2d-83ee-de7f6f79a659.png) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 19 03](https://user-images.githubusercontent.com/64316080/174355522-92c5756f-6f77-4ea5-be61-8a11903f3a21.png) | 
 
 ### Teacher schedule
 
