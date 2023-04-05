@@ -24,21 +24,21 @@ git clone https://github.com/vladimirkoff/InstagramClone.git
 
 > **Note**: Minimal supported iOS/iPadOS version is 15.0
 
-# Usage
+###  Usage
 
-## Log in or Sign up to your account
+###  Log in or Sign up to your account
 
 | Log in  | Sign up |
 | ------------- | ------------- | 
 | ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-01 at 11 27 11](https://user-images.githubusercontent.com/115025494/229292028-93d36e3b-9913-4f1d-b85f-6bebbbde62b1.png)| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-04 at 16 29 33](https://user-images.githubusercontent.com/115025494/229852134-a9ea95bb-6668-41b6-9bec-4e766da714d9.png) | 
 
-## Your posts
+###  Your posts
 
 | Pick an image  | Use filters | Create post |
 | ------------- | ------------- | ------------- |
 | ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-04 at 19 17 41](https://user-images.githubusercontent.com/115025494/229862268-2fa3cfda-c556-41d0-8860-ebc92904c5df.png)| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 16 36 47](https://user-images.githubusercontent.com/115025494/230097214-87abef99-3fc0-43c7-9f64-40d2bda777e5.png)| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 16 34 04](https://user-images.githubusercontent.com/115025494/230096677-a00934a6-cc7e-4372-b77e-01198ec4425f.png)|
 
-## Profile
+###  Profile
 
 | Check your posts | Check saved posts  | Edit profile |
 | ------------- | ------------- | ------------- |
