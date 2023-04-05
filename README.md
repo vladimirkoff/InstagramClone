@@ -53,9 +53,9 @@ git clone https://github.com/vladimirkoff/InstagramClone.git
 
 ## Other features
 
-| Search for users | Recieve notifications  | Like and share |
-| ------------- | ------------- | ------------- |
-| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 17 07 15](https://user-images.githubusercontent.com/115025494/230106477-2eb10d6c-0b2d-445d-b6bc-d3629c9b92dd.png)|![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 17 08 12](https://user-images.githubusercontent.com/115025494/230106491-39959683-3784-4234-939f-8cc7fa7df5c7.png) | ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-04 at 19 19 03](https://user-images.githubusercontent.com/115025494/229862351-e1b007ab-16e5-458a-875e-51fb785f16a1.png)|
+| Search for users | Recieve notifications  | 
+| ------------- | ------------- | 
+| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 17 07 15](https://user-images.githubusercontent.com/115025494/230106477-2eb10d6c-0b2d-445d-b6bc-d3629c9b92dd.png)|![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 17 08 12](https://user-images.githubusercontent.com/115025494/230106491-39959683-3784-4234-939f-8cc7fa7df5c7.png) | 
 
 
 
