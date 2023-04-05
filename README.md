@@ -27,7 +27,7 @@ git clone https://github.com/vladimirkoff/InstagramClone.git
 
 | Log in  | Sign up |
 | ------------- | ------------- | 
-| ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 18 55](https://user-images.githubusercontent.com/64316080/174355497-c28cb3e1-944e-4e2d-83ee-de7f6f79a659.png) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 19 03](https://user-images.githubusercontent.com/64316080/174355522-92c5756f-6f77-4ea5-be61-8a11903f3a21.png) | 
+| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-01 at 11 27 11](https://user-images.githubusercontent.com/115025494/229292028-93d36e3b-9913-4f1d-b85f-6bebbbde62b1.png)| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-04 at 16 29 33](https://user-images.githubusercontent.com/115025494/229852134-a9ea95bb-6668-41b6-9bec-4e766da714d9.png) | 
 
 ### Teacher schedule
 
@@ -37,11 +37,11 @@ git clone https://github.com/vladimirkoff/InstagramClone.git
 
 # Log in your account
 
-![Simulator Screen Shot - iPhone 14 Pro - 2023-04-01 at 11 27 11](https://user-images.githubusercontent.com/115025494/229292028-93d36e3b-9913-4f1d-b85f-6bebbbde62b1.png)
+
 
 # Or create one
 
-![Simulator Screen Shot - iPhone 14 Pro - 2023-04-04 at 16 29 33](https://user-images.githubusercontent.com/115025494/229852134-a9ea95bb-6668-41b6-9bec-4e766da714d9.png)
+
 
 # Post your image 
 ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-04 at 19 17 41](https://user-images.githubusercontent.com/115025494/229862268-2fa3cfda-c556-41d0-8860-ebc92904c5df.png)
