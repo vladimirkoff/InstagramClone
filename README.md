@@ -1,9 +1,11 @@
 # InsragramClone
 
-### Simple iOS/iPadOS application which uses and has following features:
+### UIKit Instagram Clone app for iOS/iPadOS built with Firebase
 
-- Group schedule
-- Teacher schedule
+- Sign up/ Log in
+- Post pictures with captions
+- Comment posts
+- Manage your posts
 
 # Log in your account
 
