@@ -1,6 +1,6 @@
 # InsragramClone
 
-Simple iOS/iPadOS application which uses and has following features:
+### Simple iOS/iPadOS application which uses and has following features:
 
 - Group schedule
 - Teacher schedule
