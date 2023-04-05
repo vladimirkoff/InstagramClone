@@ -7,6 +7,18 @@
 - Comment posts
 - Manage your posts
 
+1. Clone this repository
+
+```bash
+git clone https://github.com/vladimirkoff/InstagramClone.git
+```
+
+2. Open Schedule InstagramClone.xcworkspace in Xcode
+
+3. Select some iOS/iPadOS device and hit run button in Xcode
+
+> **Note**: Minimal supported iOS/iPadOS version is 14.0
+
 # Log in your account
 
 ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-01 at 11 27 11](https://user-images.githubusercontent.com/115025494/229292028-93d36e3b-9913-4f1d-b85f-6bebbbde62b1.png)
