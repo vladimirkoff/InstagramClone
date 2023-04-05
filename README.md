@@ -7,7 +7,10 @@
 - Comment posts
 - Manage your posts
 
+
 ## Download & Run
+
+
 
 1. Clone this repository
 
@@ -39,7 +42,7 @@ git clone https://github.com/vladimirkoff/InstagramClone.git
 
 | Check your posts | Check saved posts  | Edit profile |
 | ------------- | ------------- | ------------- |
-| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 16 40 57](https://user-images.githubusercontent.com/115025494/230098648-97ed2f28-14fc-4f9d-9b36-133ec37b6e15.png)|![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 16 41 13](https://user-images.githubusercontent.com/115025494/230098380-3752fb8a-6e09-43ea-9c60-22005c7752c3.png) | ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 16 34 04](https://user-images.githubusercontent.com/115025494/230096677-a00934a6-cc7e-4372-b77e-01198ec4425f.png)|
+| ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 16 40 57](https://user-images.githubusercontent.com/115025494/230098648-97ed2f28-14fc-4f9d-9b36-133ec37b6e15.png)|![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 16 41 13](https://user-images.githubusercontent.com/115025494/230098380-3752fb8a-6e09-43ea-9c60-22005c7752c3.png) | ![Simulator Screen Shot - iPhone 14 Pro - 2023-04-05 at 16 52 47](https://user-images.githubusercontent.com/115025494/230101590-3c9353a0-1951-4967-bcc0-d2f5dccd9bde.png)|
 
 
 
