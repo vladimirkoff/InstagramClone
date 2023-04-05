@@ -25,7 +25,7 @@ git clone https://github.com/vladimirkoff/InstagramClone.git
 
 ### Group schedule
 
-| Log in  | Sign up|
+| Log in  | Sign up |
 | ------------- | ------------- | 
 | ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 18 55](https://user-images.githubusercontent.com/64316080/174355497-c28cb3e1-944e-4e2d-83ee-de7f6f79a659.png) | ![Simulator Screen Shot - iPhone 13 Pro Max - 2022-06-17 at 21 19 03](https://user-images.githubusercontent.com/64316080/174355522-92c5756f-6f77-4ea5-be61-8a11903f3a21.png) | 
 
