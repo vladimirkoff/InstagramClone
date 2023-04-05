@@ -7,6 +7,8 @@
 - Comment posts
 - Manage your posts
 
+## Download & Run
+
 1. Clone this repository
 
 ```bash
