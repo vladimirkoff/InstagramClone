@@ -62,7 +62,7 @@ class ActionSheetCell: UITableViewCell {
         case .delete, .report:
             optionImageView.tintColor = .red
         default:
-            print("here")
+            print("Error")
         }
     }
     
