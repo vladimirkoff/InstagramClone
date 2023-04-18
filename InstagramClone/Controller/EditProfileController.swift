@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 import SDWebImage
 import JGProgressHUD
 
@@ -64,6 +65,15 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
         return label
     }()
     
+    private var emailLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .black
+        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.text = "Email"
+        return label
+    }()
+    
     private lazy var fullNameField: CustomTextField = {
         let tf = CustomTextField(placeholder: "Username")
         tf.textColor = .black
@@ -84,7 +94,16 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
         return tf
     }()
     
-    
+    private lazy var emailField: CustomTextField = {
+        let tf = CustomTextField(placeholder: "Username")
+        tf.textColor = .black
+        tf.delegate = self
+        tf.layer.borderWidth = 2
+        tf.text = Auth.auth().currentUser?.email
+        tf.layer.borderColor = UIColor.black.cgColor
+        return tf
+    }()
+        
     //MARK: - Lifecycle
     
     init(user: User) {
@@ -132,9 +151,18 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
         fullnameLabel.rightAnchor.constraint(equalTo: fullNameField.leftAnchor, constant: -2).isActive = true
         fullnameLabel.textAlignment = .left
         fullnameLabel.centerYAnchor.constraint(equalTo: fullNameField.centerYAnchor).isActive = true
+        
+        view.addSubview(emailField)
+        emailField.topAnchor.constraint(equalTo: fullNameField.bottomAnchor, constant: 10).isActive = true
+        emailField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12).isActive = true
+        emailField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 80).isActive = true
+        
+        view.addSubview(emailLabel)
+        emailLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 4).isActive = true
+        emailLabel.rightAnchor.constraint(equalTo: emailField.leftAnchor, constant: -2).isActive = true
+        emailLabel.textAlignment = .left
+        emailLabel.centerYAnchor.constraint(equalTo: emailField.centerYAnchor).isActive = true
     }
-    
-    //MARK: - Helpers
     
     //MARK: - Selectors
     
@@ -150,13 +178,13 @@ class EditProfileController: UIViewController, UIImagePickerControllerDelegate &
         let fullName = fullNameField.text
         let username = usernameField.text
         let uid = user.uid
-        
-        ImageUploader.uploadImage(image: changeProfilePhotoButton.imageView!.image!) { url in
+                
+        ImageUploader.uploadImage(image: changeProfilePhotoButton.imageView!.image!) { [weak self] url in
             let data: [String : Any] = ["profileImageUrl" : url, "username" : username!, "fullName" : fullName!, "uid" : uid]
             let user = User(dictionary: data)
-            UserService.updateUser(changedUser: user, completion: { error in
-                self.hud.dismiss()
-                self.navigationController?.popViewController(animated: true)
+            UserService.updateUser(changedUser: user, completion: { [weak self] error in
+                self?.hud.dismiss()
+                self?.navigationController?.popViewController(animated: true)
             })
         }
     }
@@ -166,7 +194,6 @@ extension EditProfileController {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         guard let selectedImage = info[.editedImage] as? UIImage else { return }
-        
         
         changeProfilePhotoButton.layer.cornerRadius = changeProfilePhotoButton.frame.width / 2
         changeProfilePhotoButton.layer.masksToBounds = true

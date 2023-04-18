@@ -102,20 +102,20 @@ class FeedController: UICollectionViewController {
     }
     
     func checkIfSaved() {
-        self.posts?.forEach({ post in
+        self.posts?.forEach({ [weak self] post in
             PostService.checkIfSaved(postId: post.postId) { isSaved in
-                if let index = self.posts?.firstIndex(where: {$0.postId == post.postId}) {
-                    self.posts![index].isSaved = isSaved
+                if let index = self?.posts?.firstIndex(where: {$0.postId == post.postId}) {
+                    self?.posts![index].isSaved = isSaved
                 }
             }
         })
     }
     
     func checkIfLiked() {
-        self.posts!.forEach { post in
+        self.posts!.forEach { [weak self] post in
             PostService.checkIfLiked(postId: post.postId) { isLiked in
-                if let index = self.posts?.firstIndex(where: {$0.postId == post.postId}) {
-                    self.posts![index].isLiked = isLiked
+                if let index = self?.posts?.firstIndex(where: {$0.postId == post.postId}) {
+                    self?.posts![index].isLiked = isLiked
                 }
             }
         }
@@ -130,18 +130,18 @@ class FeedController: UICollectionViewController {
     }
     
     func fetchPostsForUser(withUid uid: String) {
-        PostService.fetchPostsForUser(with: uid) { posts in
-            self.posts = posts
-            self.checkIfLiked()
-            self.checkIfSaved()
+        PostService.fetchPostsForUser(with: uid) { [weak self] posts in
+            self?.posts = posts
+            self?.checkIfLiked()
+            self?.checkIfSaved()
         }
     }
     
     func fetchSavedPosts() {
-        PostService.fetchSavedPosts { posts in
-            self.posts = posts
-            self.checkIfLiked()
-            self.checkIfSaved()
+        PostService.fetchSavedPosts { [weak self] posts in
+            self?.posts = posts
+            self?.checkIfLiked()
+            self?.checkIfSaved()
         }
     }
     
@@ -251,10 +251,10 @@ extension FeedController: PostCellDelegate {
     }
     
     func showOptions(cell: PostCell) {
-        UserService.fetchUser(by: cell.viewModel!.post.uid) { user in
-            self.actionSheet = ActionSheetLauncher(user: user, post: cell.viewModel!.post)
-            self.actionSheet?.delegate = self
-            self.actionSheet!.show(cell: cell)
+        UserService.fetchUser(by: cell.viewModel!.post.uid) { [weak self] user in
+            self?.actionSheet = ActionSheetLauncher(user: user, post: cell.viewModel!.post)
+            self?.actionSheet?.delegate = self ?? nil
+            self?.actionSheet!.show(cell: cell)
         }
     }
     

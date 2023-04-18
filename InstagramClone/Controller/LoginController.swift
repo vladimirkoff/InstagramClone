@@ -49,12 +49,14 @@ class LoginController: UIViewController, FormViewModel {
     
     private let emailField: CustomTextField = {
         let tf = CustomTextField(placeholder: "Email")
+        tf.autocorrectionType = .no
         return tf
     }()
     
     private let passwordField: CustomTextField = {
         let tf = CustomTextField(placeholder: "Password")
         tf.isSecureTextEntry = true
+        tf.autocorrectionType = .no
         return tf
     }()
     
@@ -131,6 +133,7 @@ class LoginController: UIViewController, FormViewModel {
     }
     @objc func textDidChange(sender: UITextField) {
         if sender == emailField {
+            emailField.text = emailField.text?.lowercased()
             viewModel.email = sender.text
         } else {
             viewModel.password = sender.text

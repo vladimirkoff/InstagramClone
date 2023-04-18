@@ -172,7 +172,6 @@ struct PostService {
                 let profileUrl = snapshot.data()["profileUrl"] as? String ?? ""
                 let timeStamp = snapshot.data()["timestamp"] as? Date ?? Date()
                 
-                
                 let comment = Comment(text: text, uid: uid, username: username, profileUrl: profileUrl, timeStamp: timeStamp)
                 return comment
             })
@@ -213,5 +212,4 @@ struct PostService {
             }
         })
     }
-    
 }

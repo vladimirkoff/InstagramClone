@@ -110,6 +110,7 @@ class UploadPostController: UIViewController {
         warning.bottomAnchor.constraint(equalTo: underline.topAnchor, constant: -8).isActive = true
     }
     
+    
     func showLoader(_ show: Bool) {
         view.endEditing(true )
         
@@ -161,8 +162,6 @@ extension UploadPostController: UITextViewDelegate {
         
         numberOfSymbols.text = "\(num)/100"
     }
-    
-    
     
 }
 

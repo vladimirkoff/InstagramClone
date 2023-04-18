@@ -221,24 +221,24 @@ class PostCell: UICollectionViewCell {
     
     @objc func didTapLike() {
         guard let post = viewModel?.post else { return }
-        delegate?.likeTapped(post: post, cell: self) { error, like in
-            guard let currentLikes = Int(self.likesLabel.text!.prefix(1)) else { return }
+        delegate?.likeTapped(post: post, cell: self) { [weak self] error, like in
+            guard let currentLikes = Int(self?.likesLabel.text!.prefix(1) ?? "0") else { return }
             switch like {
             case .liked:
-                self.likesLabel.text = "\(currentLikes + 1) likes"
-                self.likeButton.setImage(UIImage(named: "like_selected"), for: .normal)
+                self?.likesLabel.text = "\(currentLikes + 1) likes"
+                self?.likeButton.setImage(UIImage(named: "like_selected"), for: .normal)
             case .unliked:
-                self.likesLabel.text = "\(currentLikes - 1) likes"
-                self.likeButton.setImage(UIImage(named: "like_unselected"), for: .normal)
+                self?.likesLabel.text = "\(currentLikes - 1) likes"
+                self?.likeButton.setImage(UIImage(named: "like_unselected"), for: .normal)
             }
         }
     }
     
     @objc func saveTapped() {
         guard let viewModel = viewModel else { return }
-        delegate?.savePost(caption: self.captionLabel.text!, image: self.postImage.image!, uuid: viewModel.post.postId, completion: { isSaved in
+        delegate?.savePost(caption: self.captionLabel.text!, image: self.postImage.image!, uuid: viewModel.post.postId, completion: { [weak self] isSaved in
             let image = isSaved ? "ribbon" : "ribbon_filled"
-            self.saveButton.setImage(UIImage(named: image), for: .normal)
+            self?.saveButton.setImage(UIImage(named: image), for: .normal)
         })
     }
     

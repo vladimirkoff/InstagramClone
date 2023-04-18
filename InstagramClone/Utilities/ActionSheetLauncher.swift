@@ -99,9 +99,9 @@ class ActionSheetLauncher: NSObject {
         let height = CGFloat(4 * 60) + 100
         tableView.frame = CGRect(x: 0 , y: window.frame.height, width: window.frame.width, height: height)
         
-        UIView.animate(withDuration: 0.5) {
-            self.blackView.alpha = 1
-            self.tableView.frame.origin.y -= height
+        UIView.animate(withDuration: 0.5) { [weak self] in
+            self?.blackView.alpha = 1
+            self?.tableView.frame.origin.y -= height
         }
     }
     

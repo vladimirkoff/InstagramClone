@@ -33,22 +33,26 @@ class SignupController: UIViewController, FormViewModel {
     
     private let emailField: CustomTextField = {
         let tf = CustomTextField(placeholder: "Email")
+        tf.autocorrectionType = .no
         return tf
     }()
     
     private let passwordField: CustomTextField = {
         let tf = CustomTextField(placeholder: "Password")
         tf.isSecureTextEntry = true
+        tf.autocorrectionType = .no
         return tf
     }()
     
     private let usernameField: CustomTextField = {
         let tf = CustomTextField(placeholder: "Username")
+        tf.autocorrectionType = .no
         return tf
     }()
     
     private let fullnameField: CustomTextField = {
         let tf = CustomTextField(placeholder: "Fullname")
+        tf.autocorrectionType = .no
         return tf
     }()
     
@@ -166,13 +170,16 @@ class SignupController: UIViewController, FormViewModel {
     
     
     @objc func textDidChange(sender: UITextField) {
+        print("Here")
         if sender == emailField {
+            emailField.text = emailField.text?.lowercased()
             viewModel.email = sender.text
         } else if sender == passwordField {
             viewModel.password = sender.text
         } else if sender == fullnameField {
             viewModel.fullname = sender.text
         } else {
+            usernameField.text = usernameField.text?.lowercased()
             viewModel.username = sender.text
         }
         

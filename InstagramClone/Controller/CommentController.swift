@@ -47,8 +47,6 @@ class CommentController: UICollectionViewController {
         return dismiss ?? false
     }
     
-    
-    
     func fetchUser() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         UserService.fetchUser(by: uid) { user in
@@ -78,6 +76,7 @@ class CommentController: UICollectionViewController {
         super.viewWillAppear(animated)
         fetchUser()
         fetchComments()
+ //        keyboard handling : rude way
         self.tabBarController?.tabBar.isHidden = true
     }
     
@@ -123,6 +122,8 @@ class CommentController: UICollectionViewController {
     }
 }
 
+//MARK: - UICollectionViewDelegate & DataSource
+
 extension CommentController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! CommentCell
@@ -138,6 +139,8 @@ extension CommentController {
     }
 }
 
+//MARK: - UICollectionViewDelegateFlowLayout
+
 extension CommentController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
@@ -148,6 +151,8 @@ extension CommentController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: height)
     }
 }
+
+//MARK: - CommentTextViewDelegate
 
 extension CommentController: CommentTextViewDelegate {
     func postComment(text: String) {
@@ -161,13 +166,14 @@ extension CommentController: CommentTextViewDelegate {
             let uid = self.post.uid
             UserService.fetchUser(by: uid) { postUser in
                 NotificationService.commentedPost(user: self.user!, post: self.post, comment: comment) { error in
-                    print("Success")
                     self.fetchComments()
                 }
             }
         }
     }
 }
+
+//MARK: - CommentCellDelegate
 
 extension CommentController: CommentCellDelegate {
     func goToProfile(uid: String) {
@@ -176,6 +182,34 @@ extension CommentController: CommentCellDelegate {
             vc.tabBarController?.tabBar.isHidden = false
             self.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+}
+
+
+
+
+
+
+
+// keyboard handling - rude way
+
+
+extension CommentController {
+    func detectKeyboard() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+}
+
+extension CommentController {
+    @objc func keyboardWillShow() {
+        print("Show")
+        view.frame.origin.y = view.frame.origin.y - 200
+    }
+    
+    @objc func keyboardWillHide() {
+        print("Hide")
+        view.frame.origin.y = view.frame.origin.y + 200
     }
 }
 

@@ -107,18 +107,18 @@ struct UserService {
     }
     
     static func updateUser(changedUser: User, completion: @escaping(String) -> ()) {
-        print(changedUser.uid)
-        COLLECTION_USERS.document(changedUser.uid).getDocument { snapshot, error in
-            if let user = snapshot?.reference {
-                self.updateUserInPosts(uid: changedUser.uid, username: changedUser.username, url: changedUser.profileImageUrl) { error in
-                    user.updateData(["profileImageUrl" : changedUser.profileImageUrl])
-                    user.updateData(["username" : changedUser.username])
-                    user.updateData(["fullName" : changedUser.fullName])
-                    completion("error")
+            COLLECTION_USERS.document(changedUser.uid).getDocument { snapshot, error in
+                if let user = snapshot?.reference {
+                    self.updateUserInPosts(uid: changedUser.uid, username: changedUser.username, url: changedUser.profileImageUrl) { error in
+                        user.updateData(["profileImageUrl" : changedUser.profileImageUrl])
+                        user.updateData(["username" : changedUser.username])
+                        user.updateData(["fullName" : changedUser.fullName])
+                        completion("error")
+                    }
                 }
-                
             }
-        }
+     
+      
     }
     
     static func updateUserInPosts(uid: String, username: String, url: String, completion: @escaping(String) -> ()) {

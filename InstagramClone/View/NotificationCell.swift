@@ -141,7 +141,7 @@ class NotificationCell: UICollectionViewCell {
         addSubview(postImage)
         postImage.widthAnchor.constraint(equalToConstant: 50).isActive = true
         postImage.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        postImage.centerYAnchor.constraint(equalTo: profileImage.centerYAnchor).isActive = true
+        postImage.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         postImage.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -12).isActive = true
         postImage.layer.cornerRadius = 5
         
@@ -177,13 +177,13 @@ class NotificationCell: UICollectionViewCell {
         if isFollowed {
             followButton.layer.borderColor = UIColor.black.cgColor
             followButton.layer.borderWidth = 1
-            self.followButton.backgroundColor = .white
-            self.followButton.tintColor = .black
+            followButton.backgroundColor = .white
+            followButton.tintColor = .black
         } else {
             followButton.layer.borderColor = UIColor.white.cgColor
             followButton.layer.borderWidth = 1
-            self.followButton.backgroundColor = .systemBlue
-            self.followButton.tintColor = .white
+            followButton.backgroundColor = .systemBlue
+            followButton.tintColor = .white
         }
     }
     
@@ -234,8 +234,8 @@ class NotificationCell: UICollectionViewCell {
     }
     
     @objc func followButtonTapepd() {
-        delegate?.followButtonTapped(cell: self, completion: { isFollowed in
-            self.checkIfFollowed(isFollowed: isFollowed)
+        delegate?.followButtonTapped(cell: self, completion: { [weak self] isFollowed in
+            self?.checkIfFollowed(isFollowed: isFollowed)
         })
     }
     

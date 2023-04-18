@@ -47,7 +47,6 @@ class MainTabController: UITabBarController {
     //MARK: - API
     
     func checkIfLoggedIn() {
-        print(scene)
         if Auth.auth().currentUser == nil {
             DispatchQueue.main.async {
                 let controller = LoginController(scene: self.scene)
@@ -61,8 +60,8 @@ class MainTabController: UITabBarController {
     }
     
     func fetchUser() {
-        UserService.fetchUser { user in
-            self.user = user
+        UserService.fetchUser { [weak self] user in
+            self?.user = user
         }
     }
     
